@@ -1421,6 +1421,11 @@ input[type="number"] {
         letter-spacing: 3px;
     }
 
+    /* SEMBUNYIKAN NAMA DI DASHBOARD UNTUK HP */
+    #welcomeName {
+        display: none !important;
+    }
+    
     .btn-header-panduan { padding: 6px 12px; font-size: 0.8rem; }
     
     /* 2. MENU NAVIGASI (PILL) & IKON SYNC */
