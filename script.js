@@ -28,7 +28,6 @@ const TampilkanAlert = (ikon, judul, pesan) => {
         title: judul,
         text: pesan,
         confirmButtonColor: '#1a365d', // Warna Navy menyesuaikan tema
-        borderRadius: '12px'
     });
 };
 
@@ -1228,7 +1227,6 @@ function bukaPilihanFilePerjadin(urlTS, urlSPT, urlSPPD) {
         showConfirmButton: false,
         showCloseButton: true,
         width: '400px',
-        borderRadius: '12px'
     });
 }
 
@@ -1246,7 +1244,6 @@ function hapusSurat(modul, id) {
         cancelButtonColor: '#64748b',
         confirmButtonText: 'Ya, Hapus!',
         cancelButtonText: 'Batal',
-        borderRadius: '12px'
     }).then((result) => {
         
         // LANGKAH 2: Konfirmasi Kode Angka Dinamis jika Langkah 1 disetujui
@@ -1268,7 +1265,6 @@ function hapusSurat(modul, id) {
                 confirmButtonText: 'Konfirmasi Hapus',
                 confirmButtonColor: '#dc2626',
                 cancelButtonText: 'Batal',
-                borderRadius: '12px',
                 // Validasi ketikan pengguna sebelum submit berjalan
                 preConfirm: (inputUser) => {
                     if (inputUser !== kodeKonfirmasiSistem) {
@@ -2453,7 +2449,6 @@ function hapusPengaturan(submodul, idLama) {
         cancelButtonColor: '#64748b',
         confirmButtonText: 'Ya, Hapus',
         cancelButtonText: 'Batal',
-        borderRadius: '12px'
     }).then((result) => {
         if (result.isConfirmed) {
             
@@ -2473,7 +2468,6 @@ function hapusPengaturan(submodul, idLama) {
                 confirmButtonText: 'Konfirmasi Hapus',
                 confirmButtonColor: '#dc2626',
                 cancelButtonText: 'Batal',
-                borderRadius: '12px',
                 preConfirm: (inputUser) => {
                     if (inputUser !== kodeKonfirmasiSistem) {
                         Swal.showValidationMessage('PIN verifikasi salah!');
