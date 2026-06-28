@@ -185,23 +185,22 @@ function switchView(viewName) {
             userRoleEl.innerText = userMasuk.role;
         }
 
-        // --- PERUBAHAN DI SINI: Hanya muat data jika belum pernah dimuat ---
         if (!isDashboardLoaded) {
             loadDashboardData();
-            isDashboardLoaded = true; // Kunci saklarnya
+            isDashboardLoaded = true;
         }
-        // -------------------------------------------------------------------
+    } else if (viewName === 'pengaturan') {
+        // Biarkan kosong. Data pengaturan akan ditarik otomatis saat Super Admin mengklik akordion.
+        if (typeof muatReferensiGlobal === 'function') muatReferensiGlobal();
     } else {
         // Tarik data referensi dropdown secara senyap
-        if (typeof muatReferensiGlobal === 'function') {
-            muatReferensiGlobal();
-        }
+        if (typeof muatReferensiGlobal === 'function') muatReferensiGlobal();
 
-        // Jika data memori tabel lokal masih kosong, tarik dari server (Google Sheets)
+        // Jika data memori tabel lokal masih kosong, tarik dari server
         if (masterDataSurat[viewName] && masterDataSurat[viewName].length === 0) {
             fetchDataFromServer(viewName);
         } else {
-            // Jika sudah ada di memori, langsung render tabel tanpa loading
+            // Jika sudah ada di memori, langsung render tabel
             prosesDanRenderTabel(viewName);
         }
     }
