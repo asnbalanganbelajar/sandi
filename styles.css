@@ -1402,14 +1402,25 @@ input[type="number"] {
    RESPONSIF UNTUK HP (MOBILE-FIRST UI)
    ========================================== */
 @media (max-width: 768px) {
-    /* 1. BERSIH-BERSIH HEADER & LOGO */
+    /* 1. BERSIH-BERSIH HEADER & LOGO (Ditambah Trik Tukar Teks) */
     .app-header .instansi-logo, 
     .app-header .title-bottom,
     .landing-header .instansi-logo, 
     .landing-header .title-bottom { 
         display: none; /* Sembunyikan logo & subjudul untuk menghemat ruang */
     }
-    .landing-header .title-top { font-size: 1.2rem; }
+    
+    /* Sembunyikan teks instansi panjang di HP */
+    .landing-header .text-desktop {
+        display: none !important;
+    }
+    /* Munculkan teks SANDI pendek di HP */
+    .landing-header .text-mobile {
+        display: inline !important;
+        font-size: 1.4rem;
+        letter-spacing: 3px;
+    }
+
     .btn-header-panduan { padding: 6px 12px; font-size: 0.8rem; }
     
     /* 2. MENU NAVIGASI (PILL) & IKON SYNC */
