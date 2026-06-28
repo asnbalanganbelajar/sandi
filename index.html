@@ -58,11 +58,19 @@
         
         <section id="view-dashboard" class="app-view">
             <div class="dashboard-header">
-                <div>
-                    <h2 id="welcomeName">Selamat Datang, Bapak/Ibu Admin!</h2>
-                    <p class="subtitle">Berikut ringkasan jumlah data surat hingga hari ini.</p>
+                <div class="dashboard-title-area">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                        <h2 id="welcomeName" style="margin-bottom: 0; line-height: 1;">Selamat Datang, Bapak/Ibu Admin!</h2>
+                        <span class="role-badge" id="userRole" style="padding: 4px 12px; font-size: 0.8rem; transform: translateY(-1px);">Admin</span>
+                    </div>
+                    <p class="subtitle" style="margin-top: 0;">Berikut ringkasan jumlah data surat hingga hari ini.</p>
                 </div>
-                <span class="role-badge" id="userRole">Admin</span>
+                
+                <div style="margin-top: 2px;">
+                    <button class="btn-control-action refresh" onclick="refreshDashboardManual()" style="padding: 8px 16px; font-size: 0.9rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <i class="fa-solid fa-arrow-rotate-right"></i> Refresh
+                    </button>
+                </div>
             </div>
 
             <div class="stats-grid">
@@ -70,9 +78,9 @@
                     <div class="stat-info">
                         <h3>Surat Masuk</h3>
                         <div class="stat-split">
-                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countMasukBulan">...</p></div>
-                            <div class="stat-divider"></div>
                             <div class="stat-item"><span class="stat-label">Tahun Ini</span><p id="countMasukTahun">...</p></div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countMasukBulan">...</p></div>
                         </div>
                     </div>
                     <i class="fa-solid fa-inbox bg-icon"></i>
@@ -82,9 +90,9 @@
                     <div class="stat-info">
                         <h3>Surat Keluar</h3>
                         <div class="stat-split">
-                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countKeluarBulan">...</p></div>
-                            <div class="stat-divider"></div>
                             <div class="stat-item"><span class="stat-label">Tahun Ini</span><p id="countKeluarTahun">...</p></div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countKeluarBulan">...</p></div>
                         </div>
                     </div>
                     <i class="fa-solid fa-paper-plane bg-icon"></i>
@@ -94,9 +102,9 @@
                     <div class="stat-info">
                         <h3>Surat Keputusan</h3>
                         <div class="stat-split">
-                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countKeputusanBulan">...</p></div>
-                            <div class="stat-divider"></div>
                             <div class="stat-item"><span class="stat-label">Tahun Ini</span><p id="countKeputusanTahun">...</p></div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countKeputusanBulan">...</p></div>
                         </div>
                     </div>
                     <i class="fa-solid fa-gavel bg-icon"></i>
@@ -106,21 +114,15 @@
                     <div class="stat-info">
                         <h3>Surat Perjadin</h3>
                         <div class="stat-split">
-                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countPerjadinBulan">...</p></div>
-                            <div class="stat-divider"></div>
                             <div class="stat-item"><span class="stat-label">Tahun Ini</span><p id="countPerjadinTahun">...</p></div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item"><span class="stat-label">Bulan Ini</span><p id="countPerjadinBulan">...</p></div>
                         </div>
                     </div>
                     <i class="fa-solid fa-car-side bg-icon"></i>
                 </div>
             </div>
 
-            <div class="recent-activity-section">
-                <h3>Riwayat Registrasi Terakhir</h3>
-                <ul id="recentActivityList" class="activity-list">
-                    <li class="activity-loading">Memuat aktivitas terbaru...</li>
-                </ul>
-            </div>
         </section>
 
 
@@ -132,31 +134,42 @@
                     <input type="hidden" id="masuk-id" value="">
                     
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>Tanggal Surat *</label>
-                            <input type="date" id="masuk-tgl" required>
+                        
+                        <div class="form-group grid-full-width">
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div class="form-group" style="flex: 1; min-width: 140px;">
+                                    <label>Tanggal Surat *</label>
+                                    <input type="date" id="masuk-tgl" required>
+                                </div>
+                                <div class="form-group" style="flex: 1.2; min-width: 160px;">
+                                    <label>Jenis Surat *</label>
+                                    <select id="masuk-jenis" required>
+                                        <option value="">-- Pilih --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex: 1.5; min-width: 220px;">
+                                    <label>Nomor Surat *</label>
+                                    <input type="text" id="masuk-nomor" required placeholder="Masukkan nomor surat lengkap...">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Nomor Surat *</label>
-                            <input type="text" id="masuk-nomor" required placeholder="Masukkan nomor surat lengkap...">
-                        </div>
-                        <div class="form-group">
-                            <label>Jenis Surat *</label>
-                            <select id="masuk-jenis" required>
-                                <option value="">-- Pilih Jenis --</option>
-                            </select>
-                        </div>
+
                         <div class="form-group grid-full-width">
                             <label>Perihal / Deskripsi *</label>
                             <textarea id="masuk-perihal" rows="3" required placeholder="Tuliskan perihal atau ringkasan isi surat..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>Asal / Pengirim *</label>
-                            <input type="text" id="masuk-asal" required placeholder="Contoh: Sekretariat Daerah">
-                        </div>
+                        
                         <div class="form-group grid-full-width">
-                            <label>Keterangan</label>
-                            <input type="text" id="masuk-keterangan" placeholder="Catatan tambahan jika diperlukan">
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div class="form-group" style="flex: 2; min-width: 200px;">
+                                    <label>Asal / Pengirim *</label>
+                                    <input type="text" id="masuk-asal" required placeholder="Contoh: Sekretariat Daerah">
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
+                                    <label>Keterangan</label>
+                                    <input type="text" id="masuk-keterangan" placeholder="Catatan tambahan jika diperlukan">
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-group grid-full-width">
@@ -241,7 +254,7 @@
                         <div class="form-group">
                             <label>Jenis Surat *</label>
                             <select id="keluar-jenis" required>
-                                <option value="">-- Pilih Jenis --</option>
+                                <option value="">-- Pilih --</option>
                             </select>
                         </div>
                         
@@ -256,13 +269,13 @@
                             <div>
                                 <label>Nomor Urut *</label>
                                 <div class="input-with-action">
-                                    <input type="text" id="keluar-urut" required>
+                                    <input type="text" id="keluar-urut" required placeholder="Contoh: 7">
                                     <button type="button" class="btn-input-action" onclick="jalankanDetektorNomor('keluar')" title="Pindai Nomor Kosong">💡</button>
                                 </div>
                             </div>
                             <div>
                                 <label>Kode Lanjutan *</label>
-                                <input type="text" id="keluar-lanjutan" value="Lampihong" required>
+                                <input type="text" id="keluar-lanjutan" value="KEC.LPHG-BLG" required>
                             </div>
                             <div>
                                 <label>Tahun *</label>
@@ -273,7 +286,7 @@
                         <div class="form-group grid-full-width">
                             <label>Pratinjau Nomor Surat</label>
                             <div class="preview-box" id="keluar-preview-nomor">
-                                .../.../Lampihong/2026
+                                .../.../KEC.LPHG-BLG/2026
                             </div>
                         </div>
 
@@ -281,15 +294,18 @@
                             <label>Perihal / Deskripsi *</label>
                             <textarea id="keluar-perihal" rows="3" required placeholder="Tuliskan perihal atau ringkasan isi surat..."></textarea>
                         </div>
-
+                        
                         <div class="form-group grid-full-width">
-                            <label>Tujuan / Penerima *</label>
-                            <input type="text" id="keluar-tujuan" required placeholder="Contoh: Kepala Desa Simpang Tiga">
-                        </div>
-
-                        <div class="form-group grid-full-width">
-                            <label>Keterangan</label>
-                            <input type="text" id="keluar-keterangan" placeholder="Catatan tambahan jika diperlukan">
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div class="form-group" style="flex: 2; min-width: 200px;">
+                                    <label>Tujuan / Penerima *</label>
+                                    <input type="text" id="keluar-tujuan" required placeholder="Contoh: Kepala Desa Simpang Tiga">
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
+                                    <label>Keterangan</label>
+                                    <input type="text" id="keluar-keterangan" placeholder="Catatan tambahan jika diperlukan">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group grid-full-width">
@@ -309,7 +325,7 @@
                                         <i class="fa-solid fa-cloud-arrow-up"></i> Unggah
                                     </button>
                                 </div>
-                                <small id="status-upload-keluar" style="color: #64748b; display: block; margin-top: 6px; font-style: italic;">Pilih file lalu tekan tombol Unggah.</small>
+                                <small id="status-upload-keluar" style="color: #64748b; display: block; margin-top: 6px; font-style: italic;">Pilih file lalu klik tombol Unggah.</small>
                                 <input type="hidden" id="keluar-file-url" value="">
                             </div>
                             <div id="input-url-keluar" class="file-input-area" style="display: none;">
@@ -386,13 +402,13 @@
                             <div>
                                 <label>Nomor Urut *</label>
                                 <div class="input-with-action">
-                                    <input type="text" id="keputusan-urut" required>
+                                    <input type="text" id="keputusan-urut" required placeholder="Contoh: 7">
                                     <button type="button" class="btn-input-action" onclick="jalankanDetektorNomor('keputusan')" title="Pindai Nomor Kosong">💡</button>
                                 </div>
                             </div>
                             <div>
                                 <label>Kode Lanjutan *</label>
-                                <input type="text" id="keputusan-lanjutan" value="Lampihong" required>
+                                <input type="text" id="keputusan-lanjutan" value="KEC.LPHG-BLG" required>
                             </div>
                             <div>
                                 <label>Tahun *</label>
@@ -403,23 +419,26 @@
                         <div class="form-group grid-full-width">
                             <label>Pratinjau Nomor SK</label>
                             <div class="preview-box" id="keputusan-preview-nomor">
-                                .../.../Lampihong/2026
+                                .../.../KEC.LPHG-BLG/2026
                             </div>
                         </div>
 
                         <div class="form-group grid-full-width">
                             <label>Tentang *</label>
-                            <textarea id="keputusan-perihal" rows="3" required placeholder="Tuliskan tentang apa surat keputusan ini..."></textarea>
+                            <textarea id="keputusan-perihal" rows="3" required placeholder="Tuliskan perihal atau tentang apa SK tersebut..."></textarea>
                         </div>
-
+                        
                         <div class="form-group grid-full-width">
-                            <label>Penerima SK *</label>
-                            <input type="text" id="keputusan-tujuan" required placeholder="Contoh: Panitia Kegiatan...">
-                        </div>
-
-                        <div class="form-group grid-full-width">
-                            <label>Keterangan</label>
-                            <input type="text" id="keputusan-keterangan" placeholder="Catatan tambahan jika diperlukan">
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div class="form-group" style="flex: 2; min-width: 200px;">
+                                    <label>Penerima SK *</label>
+                                    <input type="text" id="keputusan-tujuan" required placeholder="Contoh: Panitia MTQ">
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 150px;">
+                                    <label>Keterangan</label>
+                                    <input type="text" id="keputusan-keterangan" placeholder="Catatan tambahan jika diperlukan">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group grid-full-width">
@@ -439,7 +458,7 @@
                                         <i class="fa-solid fa-cloud-arrow-up"></i> Unggah
                                     </button>
                                 </div>
-                                <small id="status-upload-keputusan" style="color: #64748b; display: block; margin-top: 6px; font-style: italic;">Pilih file lalu tekan tombol Unggah.</small>
+                                <small id="status-upload-keputusan" style="color: #64748b; display: block; margin-top: 6px; font-style: italic;">Pilih file lalu klik tombol Unggah.</small>
                                 <input type="hidden" id="keputusan-file-url" value="">
                             </div>
                             <div id="input-url-keputusan" class="file-input-area" style="display: none;">
@@ -491,45 +510,56 @@
         <section id="view-surat-perjadin" class="app-view" style="display: none;">
             
             <div id="card-form-perjadin" class="seamless-card form-accordion-card collapsible-collapsed">
-                <h3 id="title-form-perjadin">Registrasi Surat Perjadin</h3>
+                <h3 id="title-form-perjadin">Registrasi Surat Perjalanan Dinas</h3>
                 <form id="form-surat-perjadin" onsubmit="handleSimpanSurat(event, 'perjadin')">
                     <input type="hidden" id="perjadin-id" value="">
                     
                     <div class="form-section-divider"><span>A. Informasi Kegiatan</span></div>
                     <div class="form-grid">
+                        
                         <div class="form-group grid-full-width">
-                            <label>Jenis Perjalanan Dinas *</label>
-                            <select id="perjadin-jenis" required>
-                                <option value="">-- Pilih Jenis --</option>
-                                <option value="Dalam Daerah">Dalam Daerah</option>
-                                <option value="Dalam Provinsi">Dalam Provinsi</option>
-                                <option value="Luar Provinsi">Luar Provinsi</option>
-                                <option value="Luar Negeri">Luar Negeri</option>
-                            </select>
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div class="form-group" style="flex: 1.2; min-width: 180px;">
+                                    <label>Jenis Perjalanan Dinas *</label>
+                                    <select id="perjadin-jenis" required>
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Dalam Daerah">Dalam Daerah</option>
+                                        <option value="Dalam Provinsi">Dalam Provinsi</option>
+                                        <option value="Luar Provinsi">Luar Provinsi</option>
+                                        <option value="Luar Negeri">Luar Negeri</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 140px;">
+                                    <label>Tanggal Berangkat *</label>
+                                    <input type="date" id="perjadin-tgl-berangkat" required onchange="hitungLamaHariPerjadin()">
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 140px;">
+                                    <label>Tanggal Kembali *</label>
+                                    <input type="date" id="perjadin-tgl-kembali" required onchange="hitungLamaHariPerjadin()">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Tanggal Berangkat *</label>
-                            <input type="date" id="perjadin-tgl-berangkat" required onchange="hitungLamaHariPerjadin()">
-                        </div>
-                        <div class="form-group">
-                            <label>Tanggal Kembali *</label>
-                            <input type="date" id="perjadin-tgl-kembali" required onchange="hitungLamaHariPerjadin()">
-                        </div>
+
                         <div class="form-group grid-full-width">
-                            <label>Lama Perjalanan</label>
-                            <input type="text" id="perjadin-lama-hari" readonly style="background-color: #f8fafc; font-weight: bold; color: #0f172a;" placeholder="Otomatis dihitung...">
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                <div class="form-group" style="flex: 0.8; min-width: 100px;">
+                                    <label>Lama</label>
+                                    <input type="text" id="perjadin-lama-hari" readonly style="background-color: #f8fafc; font-weight: bold; color: #0f172a; text-align: left;" placeholder="... Hari">
+                                </div>
+                                <div class="form-group" style="flex: 2.5; min-width: 180px;">
+                                    <label>Kantor / Instansi Tujuan *</label>
+                                    <input type="text" id="perjadin-kantor-tujuan" required placeholder="Contoh: BKPSDM Balangan">
+                                </div>
+                                <div class="form-group" style="flex: 1.5; min-width: 150px;">
+                                    <label>Kota / Daerah Tujuan *</label>
+                                    <input type="text" id="perjadin-daerah-tujuan" required placeholder="Contoh: Paringin Selatan">
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="form-group grid-full-width">
                             <label>Maksud Perjalanan Dinas *</label>
                             <textarea id="perjadin-maksud" rows="2" required placeholder="Contoh: Konsultasi Pengisian EKinerja Harian..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Kantor / Instansi Tujuan *</label>
-                            <input type="text" id="perjadin-kantor-tujuan" required placeholder="Contoh: BKPSDM Balangan">
-                        </div>
-                        <div class="form-group">
-                            <label>Kota / Daerah Tujuan *</label>
-                            <input type="text" id="perjadin-daerah-tujuan" required placeholder="Contoh: Paringin Selatan">
                         </div>
                     </div>
 
@@ -537,9 +567,9 @@
                     <div class="form-grid">
                         <div class="form-group grid-full-width" style="background: #f1f5f9; padding: 15px; border-radius: 8px;">
                             <label style="color: #334155; font-size: 0.9rem;"><strong>1. Nomor Telaahan Staf</strong></label>
-                            <select id="perjadin-ts-asal" onchange="toggleFormAsal('ts')" style="margin-bottom: 15px; width: 200px;">
-                                <option value="Internal">Internal</option>
-                                <option value="Eksternal">Eksternal</option>
+                            <select id="perjadin-ts-asal" onchange="toggleFormAsal('ts')" style="margin-bottom: 15px; min-width: 350px; max-width: 100%;">
+                                <option value="Internal">Internal (TS dibuat oleh Unit Kerja sendiri)</option>
+                                <option value="Eksternal">Eksternal (TS dibuat oleh Unit Kerja Lain)</option>
                             </select>
 
                             <div id="perjadin-ts-internal-group" class="row-triple">
@@ -559,14 +589,14 @@
                                 </div>
                                 <div>
                                     <label>Kode Lanjutan</label>
-                                    <input type="text" id="perjadin-ts-lanjutan" value="Lampihong">
+                                    <input type="text" id="perjadin-ts-lanjutan" value="KEC.LPHG-BLG">
                                 </div>
                                 <div>
                                     <label>Tahun</label>
                                     <input type="number" id="perjadin-ts-tahun" value="2026">
                                 </div>
                                 <div style="grid-column: span 4;">
-                                    <div class="preview-box" id="perjadin-ts-preview-nomor">.../.../Lampihong/...</div>
+                                    <div class="preview-box" id="perjadin-ts-preview-nomor">.../.../KEC.LPHG-BLG/...</div>
                                 </div>
                             </div>
                             <div id="perjadin-ts-eksternal-group" style="display: none;">
@@ -577,9 +607,9 @@
 
                         <div class="form-group grid-full-width" style="background: #f1f5f9; padding: 15px; border-radius: 8px;">
                             <label style="color: #334155; font-size: 0.9rem;"><strong>2. Nomor Surat Perintah Tugas</strong></label>
-                            <select id="perjadin-spt-asal" onchange="toggleFormAsal('spt')" style="margin-bottom: 15px; width: 200px;">
-                                <option value="Internal">Internal</option>
-                                <option value="Eksternal">Eksternal</option>
+                            <select id="perjadin-spt-asal" onchange="toggleFormAsal('spt')" style="margin-bottom: 15px; min-width: 350px; max-width: 100%;">
+                                <option value="Internal">Internal (SPT dibuat oleh Unit Kerja sendiri)</option>
+                                <option value="Eksternal">Eksternal (SPT dibuat oleh Unit Kerja Lain)</option>
                             </select>
 
                             <div id="perjadin-spt-internal-group" class="row-triple">
@@ -599,14 +629,14 @@
                                 </div>
                                 <div>
                                     <label>Kode Lanjutan</label>
-                                    <input type="text" id="perjadin-spt-lanjutan" value="Lampihong">
+                                    <input type="text" id="perjadin-spt-lanjutan" value="KEC.LPHG-BLG">
                                 </div>
                                 <div>
                                     <label>Tahun</label>
                                     <input type="number" id="perjadin-spt-tahun" value="2026">
                                 </div>
                                 <div style="grid-column: span 4;">
-                                    <div class="preview-box" id="perjadin-spt-preview-nomor">.../.../Lampihong/...</div>
+                                    <div class="preview-box" id="perjadin-spt-preview-nomor">.../.../KEC.LPHG-BLG/...</div>
                                 </div>
                             </div>
                             <div id="perjadin-spt-eksternal-group" style="display: none;">
@@ -618,32 +648,42 @@
 
                     <div class="form-section-divider"><span>C. Pelaksana & Nomor SPPD</span></div>
                     <div class="form-group grid-full-width" style="border: 1px dashed #cbd5e1; padding: 15px; border-radius: 8px;">
-                        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px;">
-                            <div style="flex: 2.5; min-width: 200px;">
-                                <label style="display: block; margin-bottom: 6px; color: #334155; font-weight: 500;">Nama</label>
+                        
+                        <!-- Baris Input Pegawai -->
+                        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                            <div class="form-group" style="flex: 2.5; min-width: 200px;">
+                                <label>Nama</label>
                                 <div class="input-with-action">
-                                    <input type="text" id="input-pegawai-nama" placeholder="Pilih pegawai..." readonly style="background: #f8fafc; cursor: pointer;" onclick="bukaModalPegawai()">
+                                    <input type="text" id="input-pegawai-nama" placeholder="Pilih pegawai..." readonly style="background: #f8fafc; cursor: pointer; width: 100%;" onclick="bukaModalPegawai()">
                                     <button type="button" class="btn-input-action" onclick="bukaModalPegawai()">🔍</button>
                                 </div>
                             </div>
-                            <div style="flex: 2; min-width: 150px;">
-                                <label style="display: block; margin-bottom: 6px; color: #334155; font-weight: 500;">NIP</label>
-                                <input type="text" id="input-pegawai-nip" readonly style="background: #f8fafc;">
+                            <div class="form-group" style="flex: 2; min-width: 150px;">
+                                <label>NIP</label>
+                                <input type="text" id="input-pegawai-nip" readonly style="background: #f8fafc; width: 100%;">
                             </div>
-                            <div style="flex: 1.5; min-width: 100px;">
-                                <label style="display: block; margin-bottom: 6px; color: #334155; font-weight: 500;">Status</label>
-                                <input type="text" id="input-pegawai-status" readonly style="background: #f8fafc;">
+                            <div class="form-group" style="flex: 1; min-width: 100px;">
+                                <label>Status</label>
+                                <input type="text" id="input-pegawai-status" readonly style="background: #f8fafc; width: 100%;">
                             </div>
-                            <div style="flex: 1.5; min-width: 120px;">
-                                <label style="display: block; margin-bottom: 6px; color: #334155; font-weight: 500;">Nomor SPPD</label>
-                                <input type="text" id="input-pegawai-sppd" placeholder="Misal: 12A">
-                            </div>
-                            <div>
-                                <button type="button" class="btn-submit" style="padding: 10px 15px; height: 42px;" onclick="tambahPelaksanaPerjadin()">➕ Tambah</button>
+                            <div class="form-group" style="flex: 1.5; min-width: 120px;">
+                                <label>Nomor SPPD</label>
+                                <div class="input-with-action">
+                                    <input type="text" id="input-pegawai-sppd" style="width: 100%;">
+                                    <button type="button" class="btn-input-action" onclick="jalankanDetektorNomor('perjadin', 'sppd')" title="Pindai Nomor Kosong">💡</button>
+                                </div>
                             </div>
                         </div>
                         
-                        <div id="daftar-pelaksana-container" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Baris Tombol Tambah (Rata Kanan) -->
+                        <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                            <button type="button" class="btn-submit" style="padding: 10px 20px; height: 42px; display: flex; align-items: center; gap: 8px; background-color: #1a365d;" onclick="tambahPelaksanaPerjadin()">
+                                <i class="fa-solid fa-plus"></i> Tambah Pelaksana
+                            </button>
+                        </div>
+                        
+                        <!-- Area Daftar Pelaksana -->
+                        <div id="daftar-pelaksana-container" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
                             <p id="pelaksana-kosong" style="color: #64748b; font-size: 0.9rem; font-style: italic;">Belum ada pegawai yang ditambahkan.</p>
                         </div>
                         <input type="hidden" id="perjadin-data-pelaksana" value="[]">
@@ -653,39 +693,84 @@
                     <div class="form-grid">
                         
                         <div class="form-group grid-full-width">
-                            <label>File Telaahan Staf (TS)</label>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="file" id="perjadin-ts-file" accept="application/pdf,image/*" style="flex: 1;" onchange="resetStatusUnggah('perjadin-ts')">
-                                <button type="button" class="btn-submit" onclick="unggahFileSatuPerSatu('perjadin-ts')" id="btn-upload-perjadin-ts" style="padding: 10px 15px; height: 42px; display: flex; gap: 6px; align-items: center; background-color: #0284c7;">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i> Unggah TS
-                                </button>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 10px;">
+                                <label style="margin-bottom: 0;">File Telaahan Staf (TS)</label>
+                                <div class="method-toggle" style="margin-bottom: 0;">
+                                    <label class="radio-label">
+                                        <input type="radio" name="method-perjadin-ts" value="upload" checked onchange="switchFileMethod('perjadin-ts', 'upload')"> Unggah
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="method-perjadin-ts" value="url" onchange="switchFileMethod('perjadin-ts', 'url')"> Tempel URL
+                                    </label>
+                                </div>
                             </div>
-                            <small id="status-upload-perjadin-ts" style="color: #64748b; font-style: italic;">Pilih file TS lalu klik Unggah.</small>
-                            <input type="hidden" id="perjadin-ts-file-url" value="">
+                            <div id="input-upload-perjadin-ts" class="file-input-area">
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="file" id="perjadin-ts-file" accept="application/pdf,image/*" style="flex: 1;" onchange="resetStatusUnggah('perjadin-ts')">
+                                    <button type="button" class="btn-submit" onclick="unggahFileSatuPerSatu('perjadin-ts')" id="btn-upload-perjadin-ts" style="padding: 10px 15px; height: 42px; display: flex; gap: 6px; align-items: center; background-color: #0284c7;">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i> Unggah TS
+                                    </button>
+                                </div>
+                                <small id="status-upload-perjadin-ts" style="color: #64748b; font-style: italic;">Pilih file TS lalu klik Unggah.</small>
+                                <input type="hidden" id="perjadin-ts-file-url" value="">
+                            </div>
+                            <div id="input-url-perjadin-ts" class="file-input-area" style="display: none;">
+                                <input type="url" id="perjadin-ts-url" placeholder="https://drive.google.com/..." style="width: 100%;">
+                            </div>
                         </div>
 
                         <div class="form-group grid-full-width">
-                            <label>File Surat Perintah Tugas (SPT)</label>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="file" id="perjadin-spt-file" accept="application/pdf,image/*" style="flex: 1;" onchange="resetStatusUnggah('perjadin-spt')">
-                                <button type="button" class="btn-submit" onclick="unggahFileSatuPerSatu('perjadin-spt')" id="btn-upload-perjadin-spt" style="padding: 10px 15px; height: 42px; display: flex; gap: 6px; align-items: center; background-color: #0284c7;">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i> Unggah SPT
-                                </button>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 10px;">
+                                <label style="margin-bottom: 0;">File Surat Perintah Tugas (SPT)</label>
+                                <div class="method-toggle" style="margin-bottom: 0;">
+                                    <label class="radio-label">
+                                        <input type="radio" name="method-perjadin-spt" value="upload" checked onchange="switchFileMethod('perjadin-spt', 'upload')"> Unggah
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="method-perjadin-spt" value="url" onchange="switchFileMethod('perjadin-spt', 'url')"> Tempel URL
+                                    </label>
+                                </div>
                             </div>
-                            <small id="status-upload-perjadin-spt" style="color: #64748b; font-style: italic;">Pilih file SPT lalu klik Unggah.</small>
-                            <input type="hidden" id="perjadin-spt-file-url" value="">
+                            <div id="input-upload-perjadin-spt" class="file-input-area">
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="file" id="perjadin-spt-file" accept="application/pdf,image/*" style="flex: 1;" onchange="resetStatusUnggah('perjadin-spt')">
+                                    <button type="button" class="btn-submit" onclick="unggahFileSatuPerSatu('perjadin-spt')" id="btn-upload-perjadin-spt" style="padding: 10px 15px; height: 42px; display: flex; gap: 6px; align-items: center; background-color: #0284c7;">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i> Unggah SPT
+                                    </button>
+                                </div>
+                                <small id="status-upload-perjadin-spt" style="color: #64748b; font-style: italic;">Pilih file SPT lalu klik Unggah.</small>
+                                <input type="hidden" id="perjadin-spt-file-url" value="">
+                            </div>
+                            <div id="input-url-perjadin-spt" class="file-input-area" style="display: none;">
+                                <input type="url" id="perjadin-spt-url" placeholder="https://drive.google.com/..." style="width: 100%;">
+                            </div>
                         </div>
 
                         <div class="form-group grid-full-width">
-                            <label>File Gabungan SPPD</label>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="file" id="perjadin-sppd-file" accept="application/pdf,image/*" style="flex: 1;" onchange="resetStatusUnggah('perjadin-sppd')">
-                                <button type="button" class="btn-submit" onclick="unggahFileSatuPerSatu('perjadin-sppd')" id="btn-upload-perjadin-sppd" style="padding: 10px 15px; height: 42px; display: flex; gap: 6px; align-items: center; background-color: #0284c7;">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i> Unggah SPPD
-                                </button>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 10px;">
+                                <label style="margin-bottom: 0;">File Gabungan SPPD</label>
+                                <div class="method-toggle" style="margin-bottom: 0;">
+                                    <label class="radio-label">
+                                        <input type="radio" name="method-perjadin-sppd" value="upload" checked onchange="switchFileMethod('perjadin-sppd', 'upload')"> Unggah
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="method-perjadin-sppd" value="url" onchange="switchFileMethod('perjadin-sppd', 'url')"> Tempel URL
+                                    </label>
+                                </div>
                             </div>
-                            <small id="status-upload-perjadin-sppd" style="color: #64748b; font-style: italic;">Pilih file Gabungan SPPD lalu klik Unggah.</small>
-                            <input type="hidden" id="perjadin-sppd-file-url" value="">
+                            <div id="input-upload-perjadin-sppd" class="file-input-area">
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="file" id="perjadin-sppd-file" accept="application/pdf,image/*" style="flex: 1;" onchange="resetStatusUnggah('perjadin-sppd')">
+                                    <button type="button" class="btn-submit" onclick="unggahFileSatuPerSatu('perjadin-sppd')" id="btn-upload-perjadin-sppd" style="padding: 10px 15px; height: 42px; display: flex; gap: 6px; align-items: center; background-color: #0284c7;">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i> Unggah SPPD
+                                    </button>
+                                </div>
+                                <small id="status-upload-perjadin-sppd" style="color: #64748b; font-style: italic;">Pilih file Gabungan SPPD lalu klik Unggah.</small>
+                                <input type="hidden" id="perjadin-sppd-file-url" value="">
+                            </div>
+                            <div id="input-url-perjadin-sppd" class="file-input-area" style="display: none;">
+                                <input type="url" id="perjadin-sppd-url" placeholder="https://drive.google.com/..." style="width: 100%;">
+                            </div>
                         </div>
 
                     </div>
@@ -728,6 +813,105 @@
                 <div id="perjadin-pagination" class="pagination-bar"></div>
             </div>
             
+        </section>
+
+        <section id="view-pengaturan" class="app-view" style="display: none;">
+            
+            <div class="dashboard-header">
+                <div class="dashboard-title-area">
+                    <h2 style="color: #1a365d; margin-bottom: 6px; line-height: 1;"><i class="fa-solid fa-gear"></i> Pengaturan</h2>
+                    <p class="subtitle" style="margin-top: 0;">Kelola referensi jenis surat, akses admin, dan data pegawai.</p>
+                </div>
+            </div>
+
+            <!-- 1. AKORDION MANAJEMEN JENIS SURAT -->
+            <div class="seamless-card" style="margin-bottom: 20px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleAkordionPengaturan('jenis')">
+                    <h3 style="color: #1a365d; font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-tags"></i> Manajemen Jenis Surat</h3>
+                    <button class="btn-icon-action copy" id="btn-toggle-jenis"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div id="content-pengaturan-jenis" style="display: none; margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-control-action primary" onclick="bukaModalPengaturan('jenis')">
+                            <i class="fa-solid fa-plus"></i> Tambah Jenis Surat
+                        </button>
+                    </div>
+                    <div class="responsive-table-wrapper">
+                        <table class="seamless-table">
+                            <thead><tr>
+                                <th>Jenis Surat (Otomatis A-Z)</th>
+                                <th style="width: 15%; text-align: center;">Aksi</th>
+                            </tr></thead>
+                            <tbody id="tabel-pengaturan-jenis">
+                                <tr><td colspan="2" class="text-center loading-text">Membuka data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. AKORDION MANAJEMEN ADMIN -->
+            <div class="seamless-card" style="margin-bottom: 20px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleAkordionPengaturan('admin')">
+                    <h3 style="color: #1a365d; font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-users-gear"></i> Manajemen Admin</h3>
+                    <button class="btn-icon-action copy" id="btn-toggle-admin"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div id="content-pengaturan-admin" style="display: none; margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-control-action primary" onclick="bukaModalPengaturan('admin')">
+                            <i class="fa-solid fa-user-plus"></i> Tambah Admin
+                        </button>
+                    </div>
+                    <div class="responsive-table-wrapper">
+                        <table class="seamless-table">
+                            <thead><tr>
+                                <th>Nama Lengkap</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th style="width: 15%; text-align: center;">Aksi</th>
+                            </tr></thead>
+                            <tbody id="tabel-pengaturan-admin">
+                                <tr><td colspan="4" class="text-center loading-text">Membuka data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. AKORDION MANAJEMEN PEGAWAI -->
+            <div class="seamless-card" style="margin-bottom: 20px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleAkordionPengaturan('pegawai')">
+                    <h3 style="color: #1a365d; font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-id-card-clip"></i> Manajemen Pegawai</h3>
+                    <button class="btn-icon-action copy" id="btn-toggle-pegawai"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div id="content-pengaturan-pegawai" style="display: none; margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;">
+                    <div class="table-control-bar" style="margin-bottom: 15px;">
+                        <div class="control-group-left">
+                            <button class="btn-control-action primary" onclick="bukaModalPengaturan('pegawai')">
+                                <i class="fa-solid fa-plus"></i> Tambah Pegawai
+                            </button>
+                            <div class="search-wrapper">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                <input type="text" id="pengaturan-pegawai-search" placeholder="Cari NIP, Nama, Status..." oninput="filterPengaturanPegawaiLokal()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="responsive-table-wrapper">
+                        <table class="seamless-table">
+                            <thead><tr>
+                                <th>Nama Pegawai</th>
+                                <th>NIP</th>
+                                <th>Status</th>
+                                <th style="width: 15%; text-align: center;">Aksi</th>
+                            </tr></thead>
+                            <tbody id="tabel-pengaturan-pegawai">
+                                <tr><td colspan="4" class="text-center loading-text">Membuka data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
     </main>
@@ -805,6 +989,32 @@
         </div>
     </div>
 
+    <!-- MODAL FORM UNIVERSAL UNTUK PENGATURAN -->
+    <div id="modalPengaturan" class="modal-overlay" style="display: none;">
+        <div class="modal-card width-small" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="modalPengaturanTitle">Tambah Data</h3>
+                <button class="btn-close-modal" onclick="tutupModalPengaturan()">×</button>
+            </div>
+            <div class="modal-body" style="padding-top: 20px;">
+                <form id="formPengaturan" onsubmit="handleSimpanPengaturan(event)">
+                    <input type="hidden" id="pengaturan-modul" value="">
+                    <input type="hidden" id="pengaturan-id-lama" value=""> 
+                    
+                    <div id="form-fields-pengaturan">
+                        <!-- Input form akan disuntikkan secara dinamis menggunakan JavaScript di sini -->
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 25px; margin-bottom: 0;">
+                        <button type="button" class="btn-flat" onclick="tutupModalPengaturan()">Batal</button>
+                        <button type="submit" class="btn-submit" id="btn-submit-pengaturan">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    
 </body>
 </html>
