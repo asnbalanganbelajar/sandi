@@ -22,8 +22,13 @@
                 <span class="title-bottom">KECAMATAN LAMPIHONG</span>
             </div>
         </div>
-        <div class="header-right">
-            <button class="btn-header-login" id="btnOpenLoginModal">Masuk <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 5px;"></i></button>
+        <div class="header-right" style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn-header-panduan" id="btnOpenPanduanModal">
+                <i class="fa-regular fa-file-pdf" style="margin-right: 5px;"></i> Panduan
+            </button>
+            <button class="btn-header-login" id="btnOpenLoginModal">
+                Masuk <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 5px;"></i>
+            </button>
         </div>
     </header>
 
@@ -35,6 +40,16 @@
         <p class="footer-line1">AKSI PERUBAHAN KUALITAS PELAYANAN PUBLIK 2026</p>
         <p class="footer-line2">Oleh: Risnawati, S.Kom. / NIP 198103112010012012 / NDH_04</p>
     </footer>
+
+    <div id="modalPanduan" class="modal-overlay" style="display: none;">
+        <div class="modal-card preview-large">
+            <div class="modal-header borderless-header">
+                <h3 class="login-modal-title"><i class="fa-regular fa-file-pdf"></i> Panduan Penggunaan SANDI</h3>
+                <button class="btn-close-modal" id="btnClosePanduanModal">×</button>
+            </div>
+            <div class="modal-body no-padding" id="panduanModalBody"></div>
+        </div>
+    </div>
 
     <!-- MODAL LOGIN (Telah Dipercantik) -->
     <div id="loginModal" class="modal-overlay" style="display: none;">
