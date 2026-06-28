@@ -101,18 +101,7 @@ function tampilkanDashboard() {
 }
 
 async function loadDashboardData() {
-    const activityListEl = document.getElementById('recentActivityList');
-    
     try {
-        if (activityListEl) {
-            // Spinner diletakkan di tengah dengan ukuran besar
-            activityListEl.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0;">
-                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: #1a365d; margin-bottom: 15px;"></i>
-                    <p style="color: #64748b; font-weight: 500;">Menghimpun data seluruh modul...</p>
-                </div>`;
-        }
-
         // 1. Tarik ke-4 data modul secara paralel (Super Cepat)
         const [resMasuk, resKeluar, resKeputusan, resPerjadin] = await Promise.all([
             fetch(`${API_URL}?action=readSuratMasuk`).then(r => r.json()),
@@ -157,85 +146,9 @@ async function loadDashboardData() {
         document.getElementById('countPerjadinBulan').innerText = statPerjadin.bulan;
         document.getElementById('countPerjadinTahun').innerText = statPerjadin.tahun;
         
-        // 4. Helper Pemotong Teks (Truncate)
-        function potongTeks(teks, batas) {
-            if (!teks) return '-';
-            return teks.length > batas ? teks.substring(0, batas) + '...' : teks;
-        }
-
-        // 5. Proses Penggabungan Data Aktivitas Terakhir dari 4 Modul
-        const gabunganSurat = [
-            ...dataMasuk.map(s => ({ 
-                ...s, tipe: 'Masuk', nomor: s['Nomor Surat'], 
-                teksAktivitas: `Registrasi Surat dari <strong>${s['Asal/Pengirim'] || '-'}</strong> tentang ${potongTeks(s['Perihal/Deskripsi'], 65)}` 
-            })),
-            ...dataKeluar.map(s => ({ 
-                ...s, tipe: 'Keluar', nomor: s['Nomor Surat Lengkap'], 
-                teksAktivitas: `Registrasi Surat ke <strong>${s['Tujuan/Penerima'] || '-'}</strong> tentang ${potongTeks(s['Perihal/Deskripsi'], 65)}` 
-            })),
-            ...dataKeputusan.map(s => ({ 
-                ...s, tipe: 'SK', nomor: s['Nomor Surat Lengkap'], 
-                teksAktivitas: `Registrasi SK tentang ${potongTeks(s['Perihal/Deskripsi'], 85)}` 
-            })),
-            ...dataPerjadin.map(s => {
-                const pelaksana = s['Pelaksana'] ? s['Pelaksana'].replace(/;/g, ', ') : 'Pegawai';
-                return { 
-                    ...s, tipe: 'Perjadin', nomor: s['Nomor SPT'] !== '-' ? s['Nomor SPT'] : (s['Nomor TS'] !== '-' ? s['Nomor TS'] : 'Tanpa Nomor'), 
-                    teksAktivitas: `Registrasi Perjadin ke <strong>${s['Tujuan']}</strong> atas nama <em>${potongTeks(pelaksana, 50)}</em>` 
-                };
-            })
-        ];
-        
-        // 6. Urutkan berdasarkan waktu input terbaru di atas
-        gabunganSurat.sort((a, b) => {
-            const dateA = a.Timestamp ? new Date(a.Timestamp.replace(' ', 'T')) : 0;
-            const dateB = b.Timestamp ? new Date(b.Timestamp.replace(' ', 'T')) : 0;
-            return dateB - dateA;
-        });
-        
-        // Ambil 6 aktivitas paling baru agar area list terlihat proporsional dengan tinggi card di atasnya
-        const terbaru = gabunganSurat.slice(0, 6);
-        
-        if (!activityListEl) return;
-        
-        if (terbaru.length === 0) {
-            activityListEl.innerHTML = '<li class="activity-loading">Belum ada aktivitas pencatatan surat.</li>';
-            return;
-        }
-        
-        // 7. Render ke UI List Aktivitas
-        activityListEl.innerHTML = terbaru.map(surat => {
-            const badgeClass = surat.tipe === 'SK' ? 'keputusan' : surat.tipe.toLowerCase();
-            
-            let waktuSaja = '--:--'; let tanggalSaja = '';
-            if (surat.Timestamp) {
-                const objekTanggal = new Date(surat.Timestamp.replace(' ', 'T'));
-                if (!isNaN(objekTanggal.getTime())) {
-                    waktuSaja = `${String(objekTanggal.getHours()).padStart(2, '0')}:${String(objekTanggal.getMinutes()).padStart(2, '0')}`;
-                    tanggalSaja = `${String(objekTanggal.getDate()).padStart(2, '0')}/${String(objekTanggal.getMonth() + 1).padStart(2, '0')} - `;
-                }
-            }
-            
-            return `
-                <li class="activity-item">
-                    <div class="activity-main">
-                        <span class="activity-badge ${badgeClass}">${surat.tipe}</span>
-                        <span class="activity-text">
-                            ${surat.teksAktivitas}
-                        </span>
-                    </div>
-                    <div class="activity-meta">
-                        Oleh: ${surat.Penginput || 'System'}<br>${tanggalSaja}${waktuSaja}
-                    </div>
-                </li>
-            `;
-        }).join('');
-        
     } catch (error) {
         console.error('Gagal memuat data dashboard:', error);
-        if (activityListEl) {
-            activityListEl.innerHTML = '<li class="activity-loading" style="color: #dc2626;"><i class="fa-solid fa-triangle-exclamation"></i> Gagal memuat ringkasan. Pastikan koneksi internet stabil.</li>';
-        }
+        TampilkanToast('error', 'Gagal memuat ringkasan. Pastikan koneksi internet stabil.');
     }
 }
 
@@ -272,7 +185,12 @@ function switchView(viewName) {
             userRoleEl.innerText = userMasuk.role;
         }
 
-        loadDashboardData();
+        // --- PERUBAHAN DI SINI: Hanya muat data jika belum pernah dimuat ---
+        if (!isDashboardLoaded) {
+            loadDashboardData();
+            isDashboardLoaded = true; // Kunci saklarnya
+        }
+        // -------------------------------------------------------------------
     } else {
         // Tarik data referensi dropdown secara senyap
         if (typeof muatReferensiGlobal === 'function') {
@@ -339,8 +257,21 @@ function toggleAkordion(modul) {
             renderDaftarPelaksana();
             toggleFormAsal('ts'); // Kembalikan default tampilan TS
             toggleFormAsal('spt'); // Kembalikan default tampilan SPT
+            
+            // --- KODE TAMBAHAN UNTUK RESET TOGGLE ---
+            ['ts', 'spt', 'sppd'].forEach(f => {
+                const radioUpload = document.querySelector(`input[name="method-perjadin-${f}"][value="upload"]`);
+                if (radioUpload) {
+                    radioUpload.checked = true;
+                    switchFileMethod(`perjadin-${f}`, 'upload');
+                }
+                const btnUpload = document.getElementById(`btn-upload-perjadin-${f}`);
+                const statusUpload = document.getElementById(`status-upload-perjadin-${f}`);
+                if (btnUpload) btnUpload.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Unggah';
+                if (statusUpload) statusUpload.innerHTML = '<span style="color: #64748b; font-style: italic;">Pilih file lalu klik Unggah.</span>';
+            });
+            // ----------------------------------------
         }
-        // --------------------------------------
         
         // --- PERBAIKAN: RESET JUDUL & TOMBOL SECARA DINAMIS ---
         const titleElement = document.getElementById(`title-form-${modul}`);
@@ -411,7 +342,7 @@ function initDefaultSuratKeluar() {
     const txtTahun = document.getElementById('keluar-tahun');
     const txtTgl = document.getElementById('keluar-tgl');
 
-    if (txtLanjutan && !txtLanjutan.value) txtLanjutan.value = 'Lampihong';
+    if (txtLanjutan && !txtLanjutan.value) txtLanjutan.value = 'KEC.LPHG-BLG';
     if (txtTahun && !txtTahun.value) txtTahun.value = '2026';
     if (txtTgl && !txtTgl.value) {
         txtTgl.value = new Date().toLocaleDateString('sv-SE');
@@ -492,7 +423,7 @@ async function muatReferensiGlobal() {
             selects.forEach(id => {
                 const selectEl = document.getElementById(id);
                 if (selectEl) {
-                    selectEl.innerHTML = '<option value="">-- Pilih Jenis --</option>';
+                    selectEl.innerHTML = '<option value="">-- Pilih --</option>';
                     result.data.jenis_surat.forEach(jenis => {
                         const opt = document.createElement('option');
                         opt.value = jenis;
@@ -542,8 +473,8 @@ async function sinkronReferensi() {
             selects.forEach(id => {
                 const selectEl = document.getElementById(id);
                 if (selectEl) {
-                    // Kosongkan opsi lama, sisakan opsi default "-- Pilih Jenis --"
-                    selectEl.innerHTML = '<option value="">-- Pilih Jenis --</option>';
+                    // Kosongkan opsi lama, sisakan opsi default "-- Pilih --"
+                    selectEl.innerHTML = '<option value="">-- Pilih --</option>';
                     
                     // Masukkan opsi yang baru
                     result.data.jenis_surat.forEach(jenis => {
@@ -765,22 +696,29 @@ async function handleSimpanSurat(event, modul) {
             }
             payload.dataPelaksanaJSON = dataPelaksana;
 
-            // 4. Validasi 3 Tombol Unggah File Perjadin
+            // 4. Validasi 3 Tombol Lampiran File Perjadin (Cek Upload vs URL)
             const filesToCheck = ['ts', 'spt', 'sppd'];
             for (let f of filesToCheck) {
-                const inputEl = document.getElementById(`perjadin-${f}-file`);
-                const urlEl = document.getElementById(`perjadin-${f}-file-url`);
-                
-                // Jika user memilih file tapi hidden URL-nya masih kosong, tolak!
-                if (inputEl.files.length > 0 && urlEl.value === "") {
-                    TampilkanToast('error', `File ${f.toUpperCase()} belum diunggah! Klik tombol biru "Unggah ${f.toUpperCase()}".`);
-                    btnSubmit.innerText = originalText;
-                    btnSubmit.disabled = false;
-                    return;
+                const methodFile = document.querySelector(`input[name="method-perjadin-${f}"]:checked`);
+                const methodVal = methodFile ? methodFile.value : 'upload';
+
+                if (methodVal === 'upload') {
+                    const inputEl = document.getElementById(`perjadin-${f}-file`);
+                    const hiddenUrl = document.getElementById(`perjadin-${f}-file-url`);
+                    
+                    // Jika memilih unggah tapi file dimasukkan tanpa ditekan tombol Unggah biru
+                    if (inputEl && inputEl.files.length > 0 && hiddenUrl.value === "") {
+                        TampilkanToast('error', `File ${f.toUpperCase()} belum diunggah! Klik tombol biru "Unggah ${f.toUpperCase()}".`);
+                        btnSubmit.innerText = originalText;
+                        btnSubmit.disabled = false;
+                        return;
+                    }
+                    payload[`url_${f}`] = hiddenUrl ? hiddenUrl.value : '';
+                } else {
+                    // Jika menggunakan metode tempel URL manual
+                    const manualUrl = document.getElementById(`perjadin-${f}-url`);
+                    payload[`url_${f}`] = manualUrl ? manualUrl.value.trim() : '';
                 }
-                
-                // Masukkan URL ke dalam payload
-                payload[`url_${f}`] = urlEl.value;
             }
         }
 
@@ -865,11 +803,10 @@ function renderBarisSuratMasuk(dataRows) {
     dataRows.forEach(surat => {
         const punyaAkses = userMasuk.role === 'Super Admin' || userMasuk.username === surat.Penginput;
         const tglBersih = surat['Tanggal Surat'] ? surat['Tanggal Surat'].split('T')[0] : '-';
-        const tombolPreview = surat['URL File'] ? `<button class="btn-icon-action preview" onclick="bukaPreviewModal('${surat['URL File']}')" title="Pratinjau Berkas"><i class="fa-solid fa-eye"></i></button>` : '';
+        const tombolPreview = surat['URL File'] ? `<button class="btn-icon-action preview" onclick="bukaPreviewModal('${surat['URL File']}')" title="Pratinjau File"><i class="fa-solid fa-eye"></i></button>` : '';
 
         html += `<tr>
-            <td><div class="cell-stacked"><span class="cell-date">${tglBersih}</span><span class="cell-main-text format-nomor">${surat['Nomor Surat'] || '-'}</span></div></td>
-            <td><div class="cell-stacked"><div><span class="badge-jenis-surat">${surat['Jenis Surat'] || 'Surat'}</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
+            <td><div class="cell-stacked"><span class="cell-date">${tglBersih}</span><span class="cell-main-text" style="font-weight: 600;">${surat['Nomor Surat'] || '-'}</span></div></td>            <td><div class="cell-stacked"><div><span class="badge-jenis-surat">${surat['Jenis Surat'] || 'Surat'}</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
             <td><span class="cell-normal-text">${surat['Asal/Pengirim'] || '-'}</span></td>
             <td><span class="cell-muted-text">${surat['Keterangan'] || '-'}</span></td>
             <td class="text-center"><div class="table-icon-group">
@@ -904,7 +841,7 @@ function renderBarisSuratKeluar(dataRows) {
     dataRows.forEach(surat => {
         const punyaAkses = userMasuk.role === 'Super Admin' || userMasuk.username === surat.Penginput;
         const tglBersih = surat['Tanggal Surat'] ? surat['Tanggal Surat'].split('T')[0] : '-';
-        const tombolPreview = surat['URL File'] ? `<button class="btn-icon-action preview" onclick="bukaPreviewModal('${surat['URL File']}')" title="Pratinjau Berkas"><i class="fa-solid fa-eye"></i></button>` : '';
+        const tombolPreview = surat['URL File'] ? `<button class="btn-icon-action preview" onclick="bukaPreviewModal('${surat['URL File']}')" title="Pratinjau File"><i class="fa-solid fa-eye"></i></button>` : '';
 
         html += `<tr>
             <td>
@@ -1033,7 +970,7 @@ function renderBarisSuratPerjadin(dataRows) {
 
         // Tombol Pratinjau Cerdas (Memicu Modal Pilihan File 3-in-1)
         const btnPratinjau = (surat['URL TS'] || surat['URL SPT'] || surat['URL SPPD']) 
-            ? `<button class="btn-icon-action preview" onclick="bukaPilihanFilePerjadin('${surat['URL TS']}', '${surat['URL SPT']}', '${surat['URL SPPD']}')" title="Pratinjau Berkas"><i class="fa-solid fa-eye"></i></button>` 
+            ? `<button class="btn-icon-action preview" onclick="bukaPilihanFilePerjadin('${surat['URL TS']}', '${surat['URL SPT']}', '${surat['URL SPPD']}')" title="Pratinjau File"><i class="fa-solid fa-eye"></i></button>` 
             : '';
 
         html += `<tr>
@@ -1076,7 +1013,7 @@ function bukaEditPerjadin(surat) {
     }
     
     document.getElementById('title-form-perjadin').innerText = 'Ubah Data Perjalanan Dinas';
-    document.getElementById('btn-submit-perjadin').innerText = 'Perbarui Paket Perjadin';
+    document.getElementById('btn-submit-perjadin').innerText = 'Perbarui Data';
     
     // 1. Info Kegiatan Dasar
     document.getElementById('perjadin-id').value = surat.ID;
@@ -1144,23 +1081,34 @@ function bukaEditPerjadin(surat) {
     }
     renderDaftarPelaksana();
 
-    // 4. Muat URL File Lama ke Input Tersembunyi (Hidden)
-    document.getElementById('perjadin-ts-file-url').value = surat['URL TS'] || '';
-    document.getElementById('perjadin-spt-file-url').value = surat['URL SPT'] || '';
-    document.getElementById('perjadin-sppd-file-url').value = surat['URL SPPD'] || '';
-    
-    // Ubah keterangan status tombol upload agar pengguna tahu file lama masih aman
-    function setUploadStatus(tipe, url) {
-        const status = document.getElementById(`status-upload-perjadin-${tipe}`);
-        const btn = document.getElementById(`btn-upload-perjadin-${tipe}`);
-        if (url) {
+    // 4. Muat URL File Lama & Reset Tampilan Toggle
+    const filesToLoad = [
+        { id: 'ts', url: surat['URL TS'] },
+        { id: 'spt', url: surat['URL SPT'] },
+        { id: 'sppd', url: surat['URL SPPD'] }
+    ];
+
+    filesToLoad.forEach(f => {
+        // Kembalikan saklar ke mode 'upload' secara default
+        const radioUpload = document.querySelector(`input[name="method-perjadin-${f.id}"][value="upload"]`);
+        if (radioUpload) radioUpload.checked = true;
+        switchFileMethod(`perjadin-${f.id}`, 'upload');
+        
+        // Isi kedua input sekaligus (hidden untuk mode upload, text untuk mode tempel URL)
+        document.getElementById(`perjadin-${f.id}-file-url`).value = f.url || '';
+        document.getElementById(`perjadin-${f.id}-url`).value = f.url || '';
+        
+        // Sesuaikan teks status unggahan
+        const status = document.getElementById(`status-upload-perjadin-${f.id}`);
+        const btn = document.getElementById(`btn-upload-perjadin-${f.id}`);
+        if (f.url) {
             status.innerHTML = '<span style="color: #16a34a; font-style: italic;"><i class="fa-solid fa-link"></i> File sebelumnya tersimpan. (Abaikan jika tidak diubah)</span>';
             btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Ganti File';
         } else {
-            status.innerHTML = '<span style="color: #64748b; font-style: italic;">Belum ada file. Pilih lalu tekan Unggah.</span>';
+            status.innerHTML = '<span style="color: #64748b; font-style: italic;">Belum ada file. Cari/pilih lalu klik Unggah.</span>';
             btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Unggah';
         }
-    }
+    });
 
     setUploadStatus('ts', surat['URL TS']);
     setUploadStatus('spt', surat['URL SPT']);
@@ -1429,7 +1377,7 @@ function bukaEditKeluar(surat) {
     document.getElementById('keluar-jenis').value = surat['Jenis Surat'] || '';
     document.getElementById('keluar-kode').value = surat['Kode Surat'] || '';
     document.getElementById('keluar-urut').value = surat['Nomor Urut'] || '';
-    document.getElementById('keluar-lanjutan').value = surat['Kode Lanjutan'] || 'Lampihong';
+    document.getElementById('keluar-lanjutan').value = surat['Kode Lanjutan'] || 'KEC.LPHG-BLG';
     document.getElementById('keluar-tahun').value = surat['Tahun'] || '2026';
     document.getElementById('keluar-tujuan').value = surat['Tujuan/Penerima'] || '';
     document.getElementById('keluar-perihal').value = surat['Perihal/Deskripsi'] || '';
@@ -1464,7 +1412,7 @@ function bukaEditKeputusan(surat) {
     document.getElementById('keputusan-jenis').value = surat['Jenis Surat'] || 'Surat Keputusan';
     document.getElementById('keputusan-kode').value = surat['Kode Surat'] || '';
     document.getElementById('keputusan-urut').value = surat['Nomor Urut'] || '';
-    document.getElementById('keputusan-lanjutan').value = surat['Kode Lanjutan'] || 'Lampihong';
+    document.getElementById('keputusan-lanjutan').value = surat['Kode Lanjutan'] || 'KEC.LPHG-BLG';
     document.getElementById('keputusan-tahun').value = surat['Tahun'] || new Date().getFullYear();
     document.getElementById('keputusan-tujuan').value = surat['Tujuan/Penerima'] || '';
     document.getElementById('keputusan-perihal').value = surat['Perihal/Deskripsi'] || '';
@@ -1489,14 +1437,15 @@ function bukaEditKeputusan(surat) {
 // ==========================================
 // STATE MANAJEMEN DATA LOKAL (PAGINATION & SEARCH)
 // ==========================================
-let masterDataSurat = { masuk: [], keluar: [], keputusan: [], perjadin: [] }; // <-- Tambah perjadin
+let masterDataSurat = { masuk: [], keluar: [], keputusan: [], perjadin: [] };
 let filterState = {
-    masuk: { search: '', limit: 10, page: 1 },
-    keluar: { search: '', limit: 10, page: 1 },
-    keputusan: { search: '', limit: 10, page: 1 },
-    perjadin: { search: '', limit: 10, page: 1 } // <-- Tambah perjadin
+    masuk: { search: '', limit: 5, page: 1 },
+    keluar: { search: '', limit: 5, page: 1 },
+    keputusan: { search: '', limit: 5, page: 1 },
+    perjadin: { search: '', limit: 5, page: 1 }
 };
-let modulUnduhAktif = ''; // Mengetahui rekap mana yang sedang diekspor
+let modulUnduhAktif = ''; 
+let isDashboardLoaded = false; // <--- TAMBAHKAN BARIS INI
 
 
 
@@ -1539,6 +1488,12 @@ async function fetchDataFromServer(modul) {
 function refreshDataManual(modul) {
     TampilkanToast('info', 'Menyegarkan data dari database...');
     fetchDataFromServer(modul);
+}
+
+// Fungsi Trigger Tombol Refresh Manual khusus untuk Dashboard
+function refreshDashboardManual() {
+    TampilkanToast('info', 'Menyegarkan data ringkasan Dashboard...');
+    loadDashboardData();
 }
 
 // ==========================================
@@ -1833,12 +1788,34 @@ function prosesEksporPDF() {
 // ==========================================
 // ASISTEN PEMINDAI NOMOR KOSONG / TERLEWAT
 // ==========================================
-async function jalankanDetektorNomor(modul) {
-    const tahun = document.getElementById(`${modul}-tahun`).value || new Date().getFullYear();
-    TampilkanToast('info', 'Memindai celah nomor di database...');
+async function jalankanDetektorNomor(modul, subModul = null) {
+    let tahun = new Date().getFullYear().toString();
+    let targetElementId = '';
+
+    // Tentukan tahun acuan dan target input tempat angka akan disisipkan
+    if (modul === 'perjadin') {
+        if (subModul === 'ts' || subModul === 'spt') {
+            tahun = document.getElementById(`perjadin-${subModul}-tahun`).value || tahun;
+            targetElementId = `perjadin-${subModul}-urut`;
+        } else if (subModul === 'sppd') {
+            const tglBerangkat = document.getElementById('perjadin-tgl-berangkat').value;
+            if (tglBerangkat) {
+                tahun = new Date(tglBerangkat).getFullYear().toString();
+            }
+            targetElementId = 'input-pegawai-sppd'; // Targetkan ke input pegawai
+        }
+    } else {
+        tahun = document.getElementById(`${modul}-tahun`).value || tahun;
+        targetElementId = `${modul}-urut`;
+    }
+
+    TampilkanToast('info', `Memindai celah nomor ${subModul ? subModul.toUpperCase() : modul} di database...`);
 
     try {
-        const response = await fetch(`${API_URL}?action=cekNomorKosong&modul=${modul}&tahun=${tahun}`);
+        let urlFetch = `${API_URL}?action=cekNomorKosong&modul=${modul}&tahun=${tahun}`;
+        if (subModul) urlFetch += `&subModul=${subModul}`;
+
+        const response = await fetch(urlFetch);
         const result = await response.json();
 
         if (result.status === 'success') {
@@ -1858,8 +1835,11 @@ async function jalankanDetektorNomor(modul) {
             }
             htmlPesan += `</div>`;
 
+            let titleAsisten = 'Asisten Penomoran';
+            if (subModul) titleAsisten += ` ${subModul.toUpperCase()}`;
+
             Swal.fire({
-                title: 'Asisten Penomoran',
+                title: titleAsisten,
                 html: htmlPesan,
                 icon: 'info',
                 confirmButtonText: `Gunakan Nomor ${data.next}`,
@@ -1867,10 +1847,16 @@ async function jalankanDetektorNomor(modul) {
                 cancelButtonText: 'Tutup',
                 confirmButtonColor: '#1a365d'
             }).then((res) => {
-                // Jika pengguna klik "Gunakan Nomor...", angka otomatis terisi ke form
                 if (res.isConfirmed) {
-                    document.getElementById(`${modul}-urut`).value = data.next;
-                    updateLivePreviewNomor(modul);
+                    // Masukkan angka ke input target
+                    document.getElementById(targetElementId).value = data.next;
+                    
+                    // Picu live preview nomor utuh
+                    if (modul === 'perjadin' && (subModul === 'ts' || subModul === 'spt')) {
+                        updateLivePreviewNomor(`perjadin-${subModul}`);
+                    } else if (modul !== 'perjadin') {
+                        updateLivePreviewNomor(modul);
+                    }
                 }
             });
         }
@@ -1904,7 +1890,7 @@ function renderModalPegawai(data) {
         if (statusMemuatReferensi) {
             listContainer.innerHTML = '<li class="loading-item" style="text-align: center; padding: 25px;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: #2563eb; margin-bottom: 15px;"></i><br><span style="color: #64748b;">Sedang menyinkronkan data...</span></li>';
         } else {
-            listContainer.innerHTML = '<li class="loading-item" style="padding: 15px; color: #64748b; font-style: italic;">Tidak ada data pegawai. Silakan tekan tombol Sinkron Referensi.</li>';
+            listContainer.innerHTML = '<li class="loading-item" style="padding: 15px; color: #64748b; font-style: italic;">Tidak ada data pegawai. Silakan klik tombol Sinkron Referensi.</li>';
         }
         return;
     }
@@ -2106,7 +2092,7 @@ function renderDaftarPelaksana() {
 
 // Fungsi mereset status jika pengguna tiba-tiba mengganti file setelah berhasil unggah
 function resetStatusUnggah(modul) {
-    document.getElementById(`status-upload-${modul}`).innerHTML = '<span style="color: #ea580c; font-style: italic;">File diubah. Silakan tekan tombol Unggah lagi.</span>';
+    document.getElementById(`status-upload-${modul}`).innerHTML = '<span style="color: #ea580c; font-style: italic;">File diubah. Silakan klik tombol Unggah lagi.</span>';
     document.getElementById(`${modul}-file-url`).value = ''; // Kosongkan URL lama
     
     const btnUpload = document.getElementById(`btn-upload-${modul}`);
@@ -2178,4 +2164,364 @@ function highlightNomorUrut(str) {
         return `${parts[0]}/<span class="highlight-urut">${parts[1]}</span>/${parts.slice(2).join('/')}`;
     }
     return str; // Jika format bukan x/x/x, tampilkan apa adanya
+}
+
+// ==========================================
+// STATE MANAJEMEN DATA PENGATURAN LOKAL
+// ==========================================
+let dataPengaturan = { jenis: [], admin: [], pegawai: [] };
+
+// ==========================================
+// KONTROL AKORDION PENGATURAN
+// ==========================================
+function toggleAkordionPengaturan(submodul) {
+    const content = document.getElementById(`content-pengaturan-${submodul}`);
+    const btn = document.getElementById(`btn-toggle-${submodul}`);
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+        // Otomatis tarik data saat akordion dibuka
+        fetchPengaturanData(submodul);
+    } else {
+        content.style.display = 'none';
+        btn.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+    }
+}
+
+// ==========================================
+// TARIK DATA (READ) PENGATURAN DARI SERVER
+// ==========================================
+async function fetchPengaturanData(submodul) {
+    const tbody = document.getElementById(`tabel-pengaturan-${submodul}`);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Mengambil data dari server...</td></tr>`;
+
+    let actionApi = '';
+    if (submodul === 'jenis') actionApi = 'readPengaturanJenis';
+    else if (submodul === 'admin') actionApi = 'readPengaturanAdmin';
+    else if (submodul === 'pegawai') actionApi = 'readPengaturanPegawai';
+
+    try {
+        const response = await fetch(`${API_URL}?action=${actionApi}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            dataPengaturan[submodul] = result.data;
+            renderTabelPengaturan(submodul);
+        } else {
+            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center loading-text" style="color:#dc2626;">Gagal memuat: ${result.message}</td></tr>`;
+        }
+    } catch (error) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center loading-text" style="color:#dc2626;">Koneksi terputus.</td></tr>`;
+    }
+}
+
+// ==========================================
+// RENDER TABEL PENGATURAN
+// ==========================================
+function renderTabelPengaturan(submodul) {
+    const tbody = document.getElementById(`tabel-pengaturan-${submodul}`);
+    let dataToRender = dataPengaturan[submodul];
+    let html = '';
+
+    if (!dataToRender || dataToRender.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center loading-text">Belum ada data teregistrasi.</td></tr>`;
+        return;
+    }
+
+    if (submodul === 'jenis') {
+        html = dataToRender.map(jenis => `
+            <tr>
+                <td><span class="cell-main-text">${jenis}</span></td>
+                <td class="text-center"><div class="table-icon-group">
+                    <button class="btn-icon-action edit" onclick="bukaModalPengaturan('jenis', '${jenis}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon-action delete" onclick="hapusPengaturan('jenis', '${jenis}')"><i class="fa-solid fa-trash-can"></i></button>
+                </div></td>
+            </tr>
+        `).join('');
+    } 
+    else if (submodul === 'admin') {
+        html = dataToRender.map(admin => `
+            <tr>
+                <td><span class="cell-main-text">${admin.nama}</span></td>
+                <td><span class="cell-normal-text">${admin.username}</span></td>
+                <td><span class="badge-jenis-surat" style="${admin.role === 'Super Admin' ? 'background:#fef3c7;color:#b45309;border-color:#fde68a;' : ''}">${admin.role}</span></td>
+                <td class="text-center"><div class="table-icon-group">
+                    <button class="btn-icon-action edit" onclick="bukaModalPengaturan('admin', ${JSON.stringify(admin).replace(/"/g, '&quot;')})"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon-action delete" onclick="hapusPengaturan('admin', '${admin.username}')"><i class="fa-solid fa-trash-can"></i></button>
+                </div></td>
+            </tr>
+        `).join('');
+    } 
+    else if (submodul === 'pegawai') {
+        html = dataToRender.map(pegawai => `
+            <tr>
+                <td><span class="cell-main-text">${pegawai.nama}</span></td>
+                <td><span class="cell-normal-text">${pegawai.nip}</span></td>
+                <td><span class="cell-muted-text">${pegawai.status}</span></td>
+                <td class="text-center"><div class="table-icon-group">
+                    <button class="btn-icon-action edit" onclick="bukaModalPengaturan('pegawai', ${JSON.stringify(pegawai).replace(/"/g, '&quot;')})"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn-icon-action delete" onclick="hapusPengaturan('pegawai', '${pegawai.nip}')"><i class="fa-solid fa-trash-can"></i></button>
+                </div></td>
+            </tr>
+        `).join('');
+    }
+
+    tbody.innerHTML = html;
+}
+
+// Fitur Pencarian Lokal Khusus Pegawai (Karena datanya berpotensi banyak)
+function filterPengaturanPegawaiLokal() {
+    const keyword = document.getElementById('pengaturan-pegawai-search').value.toLowerCase();
+    const tbody = document.getElementById('tabel-pengaturan-pegawai');
+    const dataTerfilter = dataPengaturan['pegawai'].filter(p => 
+        p.nama.toLowerCase().includes(keyword) || 
+        p.nip.toLowerCase().includes(keyword) || 
+        p.status.toLowerCase().includes(keyword)
+    );
+    
+    // Simpan sementara ke backup lalu render
+    const backupData = dataPengaturan['pegawai'];
+    dataPengaturan['pegawai'] = dataTerfilter;
+    renderTabelPengaturan('pegawai');
+    dataPengaturan['pegawai'] = backupData; // Kembalikan data utuh
+}
+
+// ==========================================
+// MANAJEMEN MODAL DINAMIS PENGATURAN
+// ==========================================
+function bukaModalPengaturan(submodul, dataEdit = null) {
+    const modal = document.getElementById('modalPengaturan');
+    const title = document.getElementById('modalPengaturanTitle');
+    const formContainer = document.getElementById('form-fields-pengaturan');
+    const idLamaInput = document.getElementById('pengaturan-id-lama');
+    
+    document.getElementById('pengaturan-modul').value = submodul;
+    formContainer.innerHTML = ''; // Bersihkan isian sebelumnya
+
+    let isEdit = dataEdit !== null;
+    idLamaInput.value = '';
+
+    if (submodul === 'jenis') {
+        title.innerHTML = isEdit ? '<i class="fa-solid fa-pen-to-square"></i> Edit Jenis Surat' : '<i class="fa-solid fa-plus"></i> Tambah Jenis Surat';
+        if (isEdit) idLamaInput.value = dataEdit; // dataEdit berupa string nama jenis surat
+        
+        formContainer.innerHTML = `
+            <div class="form-group margin-bottom">
+                <label>Nama Jenis Surat *</label>
+                <input type="text" id="pengaturan-jenis-nilai" value="${isEdit ? dataEdit : ''}" required placeholder="Contoh: Surat Edaran">
+            </div>
+        `;
+    } 
+    else if (submodul === 'admin') {
+        title.innerHTML = isEdit ? '<i class="fa-solid fa-user-pen"></i> Edit Admin' : '<i class="fa-solid fa-user-plus"></i> Tambah Admin';
+        if (isEdit) idLamaInput.value = dataEdit.username;
+        
+        formContainer.innerHTML = `
+            <div class="form-group margin-bottom">
+                <label>Nama Lengkap *</label>
+                <input type="text" id="pengaturan-admin-nama" value="${isEdit ? dataEdit.nama : ''}" required>
+            </div>
+            <div class="form-group margin-bottom">
+                <label>Username *</label>
+                <input type="text" id="pengaturan-admin-username" value="${isEdit ? dataEdit.username : ''}" required>
+            </div>
+            <div class="form-group margin-bottom">
+                <label>Password ${isEdit ? '<small style="color:#e53e3e;">(Kosongkan jika tidak ingin diubah)</small>' : '*'}</label>
+                <input type="password" id="pengaturan-admin-pass" ${isEdit ? '' : 'required'} placeholder="Ketik sandi rahasia...">
+            </div>
+            <div class="form-group margin-bottom">
+                <label>Hak Akses (Role) *</label>
+                <select id="pengaturan-admin-role" required>
+                    <option value="Admin" ${isEdit && dataEdit.role === 'Admin' ? 'selected' : ''}>Admin (Standar)</option>
+                    <option value="Super Admin" ${isEdit && dataEdit.role === 'Super Admin' ? 'selected' : ''}>Super Admin</option>
+                </select>
+            </div>
+        `;
+    } 
+    else if (submodul === 'pegawai') {
+        title.innerHTML = isEdit ? '<i class="fa-solid fa-pen-to-square"></i> Edit Pegawai' : '<i class="fa-solid fa-plus"></i> Tambah Pegawai';
+        if (isEdit) idLamaInput.value = dataEdit.nip;
+        
+        formContainer.innerHTML = `
+            <div class="form-group margin-bottom">
+                <label>Nama Lengkap *</label>
+                <input type="text" id="pengaturan-pegawai-nama" value="${isEdit ? dataEdit.nama : ''}" required>
+            </div>
+            <div class="form-group margin-bottom">
+                <label>NIP *</label>
+                <input type="text" id="pengaturan-pegawai-nip" value="${isEdit ? dataEdit.nip : ''}" required>
+            </div>
+            <div class="form-group margin-bottom">
+                <label>Status Kepegawaian *</label>
+                <select id="pengaturan-pegawai-status" required>
+                    <option value="PNS" ${isEdit && dataEdit.status === 'PNS' ? 'selected' : ''}>PNS</option>
+                    <option value="PPPK" ${isEdit && dataEdit.status === 'PPPK' ? 'selected' : ''}>PPPK</option>
+                    <option value="PPPKPW" ${isEdit && dataEdit.status === 'PPPKPW' ? 'selected' : ''}>PPPKPW</option>
+                </select>
+            </div>
+        `;
+    }
+
+    modal.style.display = 'flex';
+}
+
+function tutupModalPengaturan() {
+    document.getElementById('modalPengaturan').style.display = 'none';
+}
+
+// ==========================================
+// EKSEKUSI CRUD PENGATURAN (SIMPAN/EDIT)
+// ==========================================
+async function handleSimpanPengaturan(event) {
+    event.preventDefault();
+    
+    const btnSubmit = document.getElementById('btn-submit-pengaturan');
+    const originalText = btnSubmit.innerText;
+    
+    const submodul = document.getElementById('pengaturan-modul').value;
+    const idLama = document.getElementById('pengaturan-id-lama').value;
+    const tipeCrud = idLama ? 'update' : 'add';
+
+    btnSubmit.innerHTML = `<span class="spinner"></span> Menyimpan...`;
+    btnSubmit.disabled = true;
+
+    // Susun Payload Dasar
+    let payload = {
+        action: 'crudPengaturan',
+        modul: submodul,
+        tipeCrud: tipeCrud,
+        idLama: idLama,
+        username: userMasuk ? userMasuk.username : '',
+        role: userMasuk ? userMasuk.role : ''
+    };
+
+    // Ambil Data Spesifik Form
+    if (submodul === 'jenis') {
+        payload.nilai = document.getElementById('pengaturan-jenis-nilai').value.trim();
+    } else if (submodul === 'admin') {
+        payload.nama = document.getElementById('pengaturan-admin-nama').value.trim();
+        payload.username = document.getElementById('pengaturan-admin-username').value.trim(); // Username baru
+        payload.password = document.getElementById('pengaturan-admin-pass').value.trim();
+        payload.roleAkses = document.getElementById('pengaturan-admin-role').value;
+    } else if (submodul === 'pegawai') {
+        payload.nama = document.getElementById('pengaturan-pegawai-nama').value.trim();
+        payload.nip = document.getElementById('pengaturan-pegawai-nip').value.trim(); // NIP baru
+        payload.statusPegawai = document.getElementById('pengaturan-pegawai-status').value;
+    }
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            TampilkanToast('success', result.data.message);
+            tutupModalPengaturan();
+            
+            // Segarkan tabel secara otomatis
+            fetchPengaturanData(submodul);
+
+            // Segarkan referensi global (agar dropdown form surat ikut terupdate!)
+            if (submodul === 'jenis' || submodul === 'pegawai') {
+                statusMemuatReferensi = false; // Buka paksa kunci referensi
+                referensiSudahDimuat = false;
+                muatReferensiGlobal();
+            }
+        } else {
+            TampilkanAlert('error', 'Gagal', result.message);
+        }
+    } catch (error) {
+        TampilkanToast('error', 'Terjadi kesalahan jaringan.');
+    } finally {
+        btnSubmit.innerText = originalText;
+        btnSubmit.disabled = false;
+    }
+}
+
+// ==========================================
+// EKSEKUSI CRUD PENGATURAN (HAPUS 2-LANGKAH)
+// ==========================================
+function hapusPengaturan(submodul, idLama) {
+    Swal.fire({
+        title: 'Hapus Data Permanen?',
+        text: "Tindakan ini tidak bisa dibatalkan.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal',
+        borderRadius: '12px'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            
+            const kodeKonfirmasiSistem = Math.floor(1000 + Math.random() * 9000).toString();
+
+            Swal.fire({
+                title: 'Otorisasi Penghapusan',
+                html: `Ketik 4 digit PIN eksekutor ini:<br><br>
+                       <b style="font-size: 2.2rem; color: #dc2626; letter-spacing: 6px; font-family: monospace;">${kodeKonfirmasiSistem}</b>`,
+                input: 'text',
+                inputAttributes: {
+                    maxlength: 4,
+                    autofocus: 'true',
+                    style: 'text-align: center; font-size: 1.6rem; font-weight: bold; letter-spacing: 6px; width: 160px; margin: 15px auto 0; border-radius: 8px;'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Konfirmasi Hapus',
+                confirmButtonColor: '#dc2626',
+                cancelButtonText: 'Batal',
+                borderRadius: '12px',
+                preConfirm: (inputUser) => {
+                    if (inputUser !== kodeKonfirmasiSistem) {
+                        Swal.showValidationMessage('PIN verifikasi salah!');
+                    }
+                    return inputUser === kodeKonfirmasiSistem;
+                }
+            }).then(async (validationResult) => {
+                if (validationResult.isConfirmed) {
+                    
+                    Swal.fire({
+                        title: 'Menghapus Data...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                action: 'crudPengaturan',
+                                modul: submodul,
+                                tipeCrud: 'delete',
+                                idLama: idLama,
+                                username: userMasuk ? userMasuk.username : '',
+                                role: userMasuk ? userMasuk.role : ''
+                            })
+                        });
+                        const res = await response.json();
+
+                        if (res.status === 'success') {
+                            TampilkanAlert('success', 'Terhapus!', res.data.message);
+                            fetchPengaturanData(submodul);
+                            
+                            // Segarkan dropdown global form surat
+                            if (submodul === 'jenis' || submodul === 'pegawai') {
+                                statusMemuatReferensi = false; 
+                                referensiSudahDimuat = false;
+                                muatReferensiGlobal();
+                            }
+                        } else {
+                            TampilkanAlert('error', 'Gagal Dihapus', res.message);
+                        }
+                    } catch (error) {
+                        TampilkanToast('error', 'Koneksi ke server gagal.');
+                    }
+                }
+            });
+        }
+    });
 }
