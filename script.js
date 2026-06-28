@@ -787,7 +787,7 @@ async function handleSimpanSurat(event, modul) {
 function renderBarisSuratMasuk(dataRows) {
     const container = document.getElementById('tabel-surat-masuk');
     if (dataRows.length === 0) {
-        container.innerHTML = '<p class="empty-text">Tidak ada data surat masuk yang cocok.</p>';
+        container.innerHTML = '<p class="empty-text">Belum ada Surat Masuk yang diregistrasi.</p>';
         return;
     }
 
@@ -825,7 +825,7 @@ function renderBarisSuratMasuk(dataRows) {
 function renderBarisSuratKeluar(dataRows) {
     const container = document.getElementById('tabel-surat-keluar');
     if (dataRows.length === 0) {
-        container.innerHTML = '<p class="empty-text">Tidak ada data surat keluar yang cocok.</p>';
+        container.innerHTML = '<p class="empty-text">Belum ada Surat Keluar yang diregistrasi.</p>';
         return;
     }
 
@@ -869,7 +869,7 @@ function renderBarisSuratKeluar(dataRows) {
 function renderBarisSuratKeputusan(dataRows) {
     const container = document.getElementById('tabel-surat-keputusan');
     if (dataRows.length === 0) {
-        container.innerHTML = '<p class="empty-text">Tidak ada data Surat Keputusan yang cocok.</p>';
+        container.innerHTML = '<p class="empty-text">Belum ada Surat Keputusan yang diregistrasi.</p>';
         return;
     }
 
@@ -916,7 +916,7 @@ function renderBarisSuratKeputusan(dataRows) {
 function renderBarisSuratPerjadin(dataRows) {
     const container = document.getElementById('tabel-surat-perjadin');
     if (dataRows.length === 0) {
-        container.innerHTML = '<p class="empty-text">Belum ada data Perjalanan Dinas yang diregistrasi.</p>';
+        container.innerHTML = '<p class="empty-text">Belum ada Perjalanan Dinas yang diregistrasi.</p>';
         return;
     }
 
