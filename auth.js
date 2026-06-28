@@ -63,9 +63,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Menutup modal jika area gelap di luar kotak modal diklik
+    // --- LOGIKA MODAL PANDUAN PENGGUNAAN ---
+    const modalPanduan = document.getElementById('modalPanduan');
+    const btnOpenPanduanModal = document.getElementById('btnOpenPanduanModal');
+    const btnClosePanduanModal = document.getElementById('btnClosePanduanModal');
+    const panduanModalBody = document.getElementById('panduanModalBody');
+    
+    // Perhatikan: /view diubah menjadi /preview agar bisa di-embed di iframe
+    const urlPanduan = 'https://drive.google.com/file/d/1pB09UXNd88JEZylt12tahkxBZmdilQL_/preview';
+
+    if (btnOpenPanduanModal) {
+        btnOpenPanduanModal.addEventListener('click', () => {
+            // Suntikkan iframe saat tombol diklik
+            panduanModalBody.innerHTML = `<iframe src="${urlPanduan}" class="preview-iframe" allow="autoplay" style="width: 100%; height: 100%; border: none;"></iframe>`;
+            modalPanduan.style.display = 'flex';
+        });
+    }
+
+    if (btnClosePanduanModal) {
+        btnClosePanduanModal.addEventListener('click', () => {
+            modalPanduan.style.display = 'none';
+            panduanModalBody.innerHTML = ''; // Hapus iframe agar memori RAM HP/Laptop lega
+        });
+    }
+
+    // --- LOGIKA MENUTUP MODAL JIKA AREA LUAR DIKLIK ---
     window.addEventListener('click', (e) => {
-        if (e.target === loginModal) {
+        // Cek jika yang diklik adalah background gelap modal panduan
+        if (e.target === modalPanduan) {
+            modalPanduan.style.display = 'none';
+            panduanModalBody.innerHTML = ''; // Hapus iframe agar memori RAM HP/Laptop lega
+        } 
+        // Cek jika yang diklik adalah background gelap modal login
+        else if (e.target === loginModal) {
             loginModal.style.display = 'none';
         }
     });
@@ -128,3 +158,4 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogin.disabled = false;
     }
 });
+
