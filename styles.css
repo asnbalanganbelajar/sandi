@@ -312,25 +312,42 @@ h1, h2, h3 {
 }
 
 /* ==========================================
-   DESAIN KARTU DASHBOARD (WATERMARK ICON)
+   DESAIN KARTU DASHBOARD (WATERMARK ICON) - VERSI LEGA
    ========================================== */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    gap: 25px; /* Jarak antar kartu sedikit diperlebar */
     margin-bottom: 2rem;
 }
 
 .modern-card {
     border-radius: 16px;
-    padding: 25px 20px;
-    position: relative; /* Kunci penempatan ikon latar */
-    overflow: hidden; /* MEMOTONG bagian ikon yang keluar dari kartu */
+    padding: 55px 20px 30px 20px; /* Padding atas ditambah agar teks tidak tertabrak lengkungan amplop */
+    position: relative; 
+    overflow: hidden; 
     display: flex;
-    align-items: center;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+    min-height: 220px; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.03); /* Border atas (lis lama) dihapus, diganti efek amplop */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* --- EFEK TUTUP AMPLOP MELENGKUNG --- */
+.modern-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -15%; /* Dilebarkan ke kiri agar lengkungannya landai/halus */
+    width: 130%; /* Dilebarkan ke kanan */
+    height: 45px; /* Tinggi dasar tutup amplop */
+    border-radius: 0 0 50% 50%; /* Kunci bentuk lengkungan (U) di bagian bawah */
+    z-index: 0;
+    transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .modern-card:hover {
@@ -338,25 +355,34 @@ h1, h2, h3 {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* Animasi tutup amplop sedikit memanjang ke bawah saat kursor mendekat */
+.modern-card:hover::before {
+    height: 55px; 
+}
+
 /* Teks Info agar tetap berada di atas ikon */
 .stat-info {
     position: relative;
     z-index: 2; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .stat-info h3 {
-    font-size: 0.8rem;
+    font-size: 1rem; /* Ukuran judul sedikit dibesarkan */
     color: #64748b;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .stat-info p {
-    font-size: 2.2rem; /* Angka diperbesar */
-    font-weight: 700;
+    font-size: 3.5rem; /* Angka dibuat RAKSASA agar mengisi ruang vertikal */
+    font-weight: 800;
     line-height: 1;
+    margin: 0;
 }
 
 /* ==========================================
@@ -364,46 +390,49 @@ h1, h2, h3 {
    ========================================== */
 .bg-icon {
     position: absolute;
-    right: -15px;  /* Mendorong ikon ke luar batas kanan */
-    bottom: -20px; /* Mendorong ikon ke luar batas bawah */
-    font-size: 6rem; /* Ukuran raksasa */
-    opacity: 0.12; /* Transparansi agar jadi watermark */
+    right: -20px; 
+    bottom: -30px; 
+    font-size: 9rem; /* Ikon latar diperbesar menyesuaikan tinggi kartu */
+    opacity: 0.08; /* Transparansi sedikit diturunkan agar angka utama tetap mencolok */
     z-index: 1;
-    transition: transform 0.4s ease; /* Animasi saat di-hover */
+    transition: transform 0.4s ease;
 }
 
-/* Ikon sedikit berputar dan membesar saat kartu disorot mouse */
 .modern-card:hover .bg-icon {
     transform: scale(1.15) rotate(-10deg);
 }
 
 /* ==========================================
-   PALET WARNA TIAP KARTU & GRADASI LEMBUT
+   PALET WARNA TIAP KARTU (EFEK AMPLOP)
    ========================================== */
+
 .modern-card.masuk { 
     background: linear-gradient(135deg, #ffffff, #f0fdfa); 
-    border-left: 5px solid #0d9488; 
 }
+.modern-card.masuk::before { background-color: #0d9488; }
 .modern-card.masuk .bg-icon, .modern-card.masuk .stat-info p { color: #0d9488; }
 
 .modern-card.keluar { 
     background: linear-gradient(135deg, #ffffff, #eff6ff); 
-    border-left: 5px solid #2563eb; 
 }
+.modern-card.keluar::before { background-color: #2563eb; }
 .modern-card.keluar .bg-icon, .modern-card.keluar .stat-info p { color: #2563eb; }
 
-.modern-card.masuk-bulan { 
+.modern-card.keputusan { 
     background: linear-gradient(135deg, #ffffff, #fdf4ff); 
-    border-left: 5px solid #c026d3; 
 }
-.modern-card.masuk-bulan .bg-icon, .modern-card.masuk-bulan .stat-info p { color: #c026d3; }
+.modern-card.keputusan::before { background-color: #c026d3; }
+.modern-card.keputusan .bg-icon, .modern-card.keputusan .stat-info p { color: #c026d3; }
 
-.modern-card.keluar-bulan { 
+.modern-card.perjadin { 
     background: linear-gradient(135deg, #ffffff, #fffbeb); 
-    border-left: 5px solid #d97706; 
 }
-.modern-card.keluar-bulan .bg-icon, .modern-card.keluar-bulan .stat-info p { color: #d97706; }
+.modern-card.perjadin::before { background-color: #d97706; }
+.modern-card.perjadin .bg-icon, .modern-card.perjadin .stat-info p { color: #d97706; }
 
+/* ==========================================
+   QUICK ACTIONS
+   ========================================== */
 .quick-actions {
     display: flex;
     gap: 15px;
@@ -411,80 +440,14 @@ h1, h2, h3 {
 
 .btn-action {
     padding: 12px 20px;
-    flex: 1; /* Agar tombol memenuhi ruang di HP */
+    flex: 1;
 }
 
-.btn-action.primary { background: #1a365d; color: white; }
-.btn-action.secondary { background: #e2e8f0; color: #1a365d; }
+.btn-action.primary { background: #1a365d; color: white; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;}
+.btn-action.secondary { background: #e2e8f0; color: #1a365d; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;}
 .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
 
-
-/* Gaya Aktivitas Terakhir */
-.recent-activity-section {
-    margin-top: 2.5rem;
-}
-
-.recent-activity-section h3 {
-    color: #1a365d;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.activity-list {
-    list-style: none;
-    padding: 0;
-}
-
-.activity-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid #edf2f7; /* Garis pemisah tipis */
-}
-
-.activity-item:last-child {
-    border-bottom: none; /* Menghilangkan garis di baris paling bawah */
-}
-
-.activity-main {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.activity-badge {
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-}
-
-.activity-badge.masuk { background-color: #e6fffa; color: #234e52; }
-.activity-badge.keluar { background-color: #fff5f5; color: #742a2a; }
-
-.activity-text {
-    font-size: 0.95rem;
-    color: #2d3748;
-}
-
-.activity-text strong {
-    color: #1a365d;
-}
-
-.activity-meta {
-    font-size: 0.8rem;
-    color: #718096;
-    text-align: right;
-}
-
-.activity-loading {
-    color: #718096;
-    font-size: 0.9rem;
-    font-style: italic;
-    padding: 10px 0;
-}
+/* SELURUH KODE 'RECENT ACTIVITY' KE BAWAH SUDAH DIHAPUS DARI BLOK INI */
 
 /* Desain Form Akordion */
 .form-accordion-card {
@@ -615,7 +578,7 @@ h1, h2, h3 {
     gap: 6px;
 }
 
-.attachment-input-area input {
+.file-input-area input {
     width: 100%;
 }
 .file-hint {
@@ -1324,77 +1287,9 @@ input[type="number"] {
     appearance: textfield; /* Standar modern (menghilangkan peringatan VS Code) */
 }
 
-/* Responsif untuk HP */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        gap: 15px;
-        padding: 1rem;
-    }
-    .nav-links {
-        width: 100%;
-        justify-content: space-around;
-    }
-    .container {
-        padding: 1rem;
-    }
-    .seamless-card {
-        padding: 1.5rem;
-    }
-
-    .quick-actions {
-        flex-direction: column;
-    }
-
-    .activity-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-    }
-    .activity-meta {
-        text-align: left;
-        padding-left: 0;
-        color: #a0aec0;
-    }
-
-    .row-triple {
-        grid-template-columns: 1fr; /* Menumpuk ke bawah di HP */
-    }
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-    .form-actions button {
-        width: 100%;
-    }
-    .control-group-left { flex-direction: column; align-items: stretch; }
-    .search-wrapper { width: 100%; }
-    .btn-icon-refresh { align-self: flex-end; }
-
-    .table-control-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .select-clean {
-        width: fit-content;
-        align-self: flex-start;
-        margin-top: 8px;
-    }
-
-    .btn-sync-referensi {
-        font-size: 0; /* Menyembunyikan teks */
-        padding: 8px; /* Mengubah tombol jadi kotak kecil khusus ikon */
-    }
-    .btn-sync-referensi i {
-        font-size: 0.9rem; /* Mengembalikan ukuran ikon */
-    }
-}
-
 /* ==========================================
    PERBAIKAN KARTU DASHBOARD (4 MODUL)
    ========================================== */
-.modern-card {
-    padding: 28px 22px; /* Diperbesar sedikit secara vertikal */
-}
 
 /* Penataan 2 Angka Berdampingan (Split Layout) */
 .stat-split {
@@ -1430,52 +1325,161 @@ input[type="number"] {
     opacity: 0.6;
 }
 
-/* Tema Warna Card SK & Perjadin */
-.modern-card.keputusan { 
-    background: linear-gradient(135deg, #ffffff, #fdf4ff); 
-    border-left: 5px solid #c026d3; 
-}
-.modern-card.keputusan .bg-icon, .modern-card.keputusan .stat-info p { color: #c026d3; }
-
-.modern-card.perjadin { 
-    background: linear-gradient(135deg, #ffffff, #fffbeb); 
-    border-left: 5px solid #d97706; 
-}
-.modern-card.perjadin .bg-icon, .modern-card.perjadin .stat-info p { color: #d97706; }
-
-/* Tambahan Badge Aktivitas */
-.activity-badge.keputusan { background-color: #fce7f3; color: #9d174d; }
-.activity-badge.perjadin { background-color: #fef3c7; color: #b45309; }
-
-
 /* Styling tombol "Lihat Referensi" di dalam modal */
 .modal-header a:hover {
     background-color: #cbd5e1;
     color: #1a365d;
 }
 
-/* Penyesuaian Responsif Layar Sangat Kecil (HP) */
-@media (max-width: 640px) {
-    .seamless-table th, .seamless-table td {
-        padding: 10px 8px; /* Memperkecil padding tabel di HP agar lega */
-    }
-    .btn-icon-action {
-        width: 28px;
-        height: 28px;
-        font-size: 0.85rem;
-    }
+/* ==========================================
+   PERCANTIK TOMBOL SIMPAN UTAMA (CTA)
+   ========================================== */
+.form-actions {
+    margin-top: 35px; /* Memberikan ruang napas yang lega dari input terakhir */
+    padding-top: 20px;
+    border-top: 1px dashed #cbd5e1; /* Garis pemisah visual area form dan eksekusi */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
 }
 
-/* Responsif Layar Kecil (HP) */
+.form-actions .btn-submit {
+    padding: 12px 35px !important; /* Membuat tombol lebih gemuk dan panjang */
+    font-size: 1.05rem !important; /* Ukuran teks diperbesar */
+    font-weight: 700 !important; /* Teks ditebalkan */
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    background-color: #1a365d;
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3); /* Memberikan efek melayang 3D */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px; /* Menjaga lebar tetap stabil saat teks berubah jadi "Memproses..." */
+}
+
+.form-actions .btn-submit:hover {
+    transform: translateY(-3px); /* Efek tombol naik saat disorot mouse */
+    box-shadow: 0 8px 18px rgba(26, 54, 93, 0.4); /* Bayangan menebal saat disorot */
+    background-color: #2c5282;
+}
+
+/* Mempercantik tombol Batal agar seimbang */
+.form-actions .btn-flat {
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.form-actions .btn-flat:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+/* Tombol Panduan (Transparan & Outline Halus) */
+.btn-header-panduan {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.btn-header-panduan:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   RESPONSIF UNTUK HP (MOBILE-FIRST UI)
+   ========================================== */
+@media (max-width: 768px) {
+    /* 1. BERSIH-BERSIH HEADER & LOGO */
+    .app-header .instansi-logo, 
+    .app-header .title-bottom,
+    .landing-header .instansi-logo, 
+    .landing-header .title-bottom { 
+        display: none; /* Sembunyikan logo & subjudul untuk menghemat ruang */
+    }
+    .landing-header .title-top { font-size: 1.2rem; }
+    .btn-header-panduan { padding: 6px 12px; font-size: 0.8rem; }
+    
+    /* 2. MENU NAVIGASI (PILL) & IKON SYNC */
+    .app-subheader { padding: 10px 15px; }
+    .app-subheader .nav-links { gap: 8px; }
+    .app-subheader .nav-links a {
+        padding: 8px 16px; font-size: 0.85rem;
+        background-color: rgba(255, 255, 255, 0.08); 
+        border-radius: 20px; /* Gaya oval/pil */
+        border-bottom: none !important;
+    }
+    .app-subheader .nav-links a.active {
+        background-color: #3b82f6; color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .btn-sync-referensi { font-size: 0; padding: 8px; } /* Teks disembunyikan */
+    .btn-sync-referensi i { font-size: 0.9rem; } /* Hanya tampil ikon */
+
+    /* 3. LAYOUT FORMULIR & KONTROL TABEL (Kombinasi Kode Lama & Baru) */
+    .container { padding: 1rem; }
+    .seamless-card { padding: 1.5rem; }
+    .row-triple { grid-template-columns: 1fr; } /* PENTING: Menumpuk form nomor surat */
+    .form-actions { flex-direction: column-reverse; }
+    .form-actions button { width: 100%; }
+    
+    .table-control-bar, .control-group-left { 
+        flex-direction: column; align-items: stretch; gap: 12px; 
+    }
+    .search-wrapper { width: 100%; }
+    .select-clean { width: 100%; margin-top: 5px; }
+    .btn-control-action.excel { display: none !important; } /* Sembunyikan tombol PDF */
+    .btn-control-action.primary { width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
+
+    /* 4. UBAH TABEL MENJADI KARTU (CARD VIEW) */
+    .responsive-table-wrapper { border: none; background: transparent; }
+    .seamless-table thead { display: none; } /* Buang judul kolom tabel */
+    .seamless-table, .seamless-table tbody, .seamless-table tr, .seamless-table td {
+        display: block; width: 100%;
+    }
+    .seamless-table tr {
+        margin-bottom: 15px; background-color: #ffffff;
+        border: 1px solid #e2e8f0; border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        padding: 10px 15px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .seamless-table td {
+        padding: 5px 0; border-bottom: 1px dashed #cbd5e1; text-align: left !important;
+    }
+    .seamless-table td:last-child {
+        border-bottom: none; padding-top: 10px; margin-top: 5px;
+        background-color: #f8fafc; border-radius: 8px;
+    }
+    .table-icon-group { justify-content: space-around; width: 100%; }
+    .btn-icon-action { width: 40px; height: 40px; font-size: 1.1rem; }
+}
+
+/* Responsif Layar Login HP (Dari Kode Lama) */
 @media (max-width: 600px) {
     .landing-header { padding: 10px 15px; flex-direction: column; gap: 15px; }
     .header-titles { text-align: center; }
     .sandi-big-logo { max-width: 90%; }
 }
 
-/* Responsif untuk modal di HP */
+/* Responsif Modal & Dashboard Layar Sangat Kecil */
 @media (max-width: 480px) {
     .modal-header { padding: 12px; }
     .modal-header h3 { font-size: 0.95rem; }
     .modal-header a { font-size: 0.75rem; padding: 4px 8px; }
+    
+    /* Pengecilan angka kartu dashboard agar tidak melebar keluar batas */
+    .stat-info p { font-size: 2.8rem !important; }
+    .bg-icon { font-size: 7rem; right: -10px; bottom: -20px; }
 }
