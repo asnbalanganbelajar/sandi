@@ -551,6 +551,13 @@ h1, h2, h3 {
     gap: 10px;
 }
 
+/* Memaksa label dan input di dalam kolom selalu tersusun atas-bawah */
+.row-triple > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 /* Kotak Preview Nomor Surat Bersih */
 .preview-box {
     background-color: #f1f5f9;
