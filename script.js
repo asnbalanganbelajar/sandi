@@ -2546,3 +2546,47 @@ function hapusPengaturan(submodul, idLama) {
         }
     });
 }
+
+// ==========================================
+// VALIDASI SESI LATAR BELAKANG (KEAMANAN)
+// ==========================================
+async function validasiSesiLatarBelakang() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user) return; // Jika tidak ada sesi, abaikan. Biarkan script di index.html yang menangani.
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'verifyUser',
+                username: user.username
+            })
+        });
+        const result = await response.json();
+
+        // Jika server menjawab error (akun sudah dihapus dari sheet)
+        if (result.status === 'error') {
+            // 1. Hapus memori kunci di browser
+            localStorage.removeItem('currentUser'); 
+            
+            // 2. Tampilkan peringatan keras dan tendang ke halaman login
+            Swal.fire({
+                icon: 'error',
+                title: 'Akses Ditolak',
+                text: 'Akun Anda telah dicabut atau dinonaktifkan oleh sistem.',
+                confirmButtonColor: '#dc2626',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(() => {
+                window.location.replace('login.html');
+            });
+        }
+    } catch (error) {
+        // Abaikan secara senyap jika terjadi error jaringan sementara (offline)
+        console.log("Validasi sesi tertunda: Koneksi terputus.");
+    }
+}
+
+// Eksekusi fungsi secara otomatis dengan jeda 1,5 detik setiap kali aplikasi dimuat, 
+// agar tidak mengganggu kecepatan loading animasi tabel dasbor.
+setTimeout(validasiSesiLatarBelakang, 1500);
