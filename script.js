@@ -1540,19 +1540,25 @@ function prosesDanRenderTabel(modul) {
     });
 
     // ==========================================
-    // TAMBAHAN: URUTKAN DATA BERDASARKAN TANGGAL (Terbaru di Atas)
+    // PERBAIKAN: URUTKAN BERDASARKAN TANGGAL, LALU NOMOR URUT
     // ==========================================
     dataTerfilter.sort((a, b) => {
-        // Tentukan kolom tanggal mana yang dipakai berdasarkan modul
         let stringTanggalA = modul === 'perjadin' ? a['Tanggal Berangkat'] : a['Tanggal Surat'];
         let stringTanggalB = modul === 'perjadin' ? b['Tanggal Berangkat'] : b['Tanggal Surat'];
         
-        // Ubah string menjadi objek waktu (Date) agar bisa dikalkulasi secara matematis
         let waktuA = stringTanggalA ? new Date(stringTanggalA).getTime() : 0;
         let waktuB = stringTanggalB ? new Date(stringTanggalB).getTime() : 0;
         
-        // Pengurutan Descending (Waktu B - Waktu A = Waktu terbesar/terbaru di atas)
-        return waktuB - waktuA;
+        // 1. Bandingkan Tanggal (Terbaru di atas / Descending)
+        if (waktuB !== waktuA) {
+            return waktuB - waktuA; 
+        } 
+        // 2. Jika Tanggal SAMA, bandingkan Nomor Urut (Terbesar di atas)
+        else {
+            let noA = parseInt(a['Nomor Urut']) || 0;
+            let noB = parseInt(b['Nomor Urut']) || 0;
+            return noB - noA; 
+        }
     });
 
    // 2. HITUNG PAGINATION DATA
@@ -1627,6 +1633,28 @@ function prosesEksporPDF() {
         let tglField = modulUnduhAktif === 'perjadin' ? s['Tanggal Berangkat'] : s['Tanggal Surat'];
         const tglObj = tglField ? tglField.split('T')[0] : '';
         return tglObj >= tglMulai && tglObj <= tglSelesai;
+    });
+
+    // ==========================================
+    // URUTAN KHUSUS PDF: TERLAMA DI ATAS (KRONOLOGIS)
+    // ==========================================
+    dataTerfilter.sort((a, b) => {
+        let tglFieldA = modulUnduhAktif === 'perjadin' ? a['Tanggal Berangkat'] : a['Tanggal Surat'];
+        let tglFieldB = modulUnduhAktif === 'perjadin' ? b['Tanggal Berangkat'] : b['Tanggal Surat'];
+        
+        let waktuA = tglFieldA ? new Date(tglFieldA).getTime() : 0;
+        let waktuB = tglFieldB ? new Date(tglFieldB).getTime() : 0;
+        
+        // 1. Bandingkan Tanggal (Terlama di atas / Ascending)
+        if (waktuA !== waktuB) {
+            return waktuA - waktuB; 
+        } 
+        // 2. Jika Tanggal SAMA, bandingkan Nomor Urut (Terkecil di atas)
+        else {
+            let noA = parseInt(a['Nomor Urut']) || 0;
+            let noB = parseInt(b['Nomor Urut']) || 0;
+            return noA - noB; 
+        }
     });
 
     if (dataTerfilter.length === 0) {
