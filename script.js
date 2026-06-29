@@ -2342,7 +2342,7 @@ function bukaModalPengaturan(submodul, dataEdit = null) {
         
         formContainer.innerHTML = `
             <div class="form-group margin-bottom">
-                <label>Nama Lengkap *</label>
+                <label>Nama *</label>
                 <input type="text" id="pengaturan-admin-nama" value="${isEdit ? dataEdit.nama : ''}" required>
             </div>
             <div class="form-group margin-bottom">
@@ -2368,7 +2368,7 @@ function bukaModalPengaturan(submodul, dataEdit = null) {
         
         formContainer.innerHTML = `
             <div class="form-group margin-bottom">
-                <label>Nama Lengkap *</label>
+                <label>Nama *</label>
                 <input type="text" id="pengaturan-pegawai-nama" value="${isEdit ? dataEdit.nama : ''}" required>
             </div>
             <div class="form-group margin-bottom">
