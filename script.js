@@ -804,7 +804,7 @@ function renderBarisSuratMasuk(dataRows) {
         const tombolPreview = surat['URL File'] ? `<button class="btn-icon-action preview" onclick="bukaPreviewModal('${surat['URL File']}')" title="Pratinjau File"><i class="fa-solid fa-eye"></i></button>` : '';
 
         html += `<tr>
-            <td><div class="cell-stacked"><span class="cell-date">${tglBersih}</span><span class="cell-main-text" style="font-weight: 600;">${surat['Nomor Surat'] || '-'}</span></div></td>            <td><div class="cell-stacked"><div><span class="badge-jenis-surat">${surat['Jenis Surat'] || 'Surat'}</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
+            <td><div class="cell-stacked"><span class="cell-date">${tglBersih}</span><span class="cell-main-text" style="font-weight: 600;">${surat['Nomor Surat'] || '-'}</span></div></td>            <td><div class="cell-stacked"><div><span class="badge-jenis-surat badge-masuk">${surat['Jenis Surat'] || 'Surat'}</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
             <td><span class="cell-normal-text">${surat['Asal/Pengirim'] || '-'}</span></td>
             <td><span class="cell-muted-text">${surat['Keterangan'] || '-'}</span></td>
             <td class="text-center"><div class="table-icon-group">
@@ -848,7 +848,7 @@ function renderBarisSuratKeluar(dataRows) {
                     <span class="cell-main-text" style="font-weight: 600;">${highlightNomorUrut(surat['Nomor Surat Lengkap'] || '-')}</span>
                 </div>
             </td>
-            <td><div class="cell-stacked"><div><span class="badge-jenis-surat">${surat['Jenis Surat'] || 'Surat'}</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
+            <td><div class="cell-stacked"><div><span class="badge-jenis-surat badge-keluar">${surat['Jenis Surat'] || 'Surat'}</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
             <td><span class="cell-normal-text">${surat['Tujuan/Penerima'] || '-'}</span></td>
             <td><span class="cell-muted-text">${surat['Keterangan'] || '-'}</span></td>
             <td class="text-center"><div class="table-icon-group">
@@ -892,7 +892,7 @@ function renderBarisSuratKeputusan(dataRows) {
                     <span class="cell-main-text" style="font-weight: 600;">${highlightNomorUrut(surat['Nomor Surat Lengkap'] || '-')}</span>
                 </div>
             </td>
-            <td><div class="cell-stacked"><div><span class="badge-jenis-surat" style="background-color: #fce7f3; color: #9d174d; border-color: #fbcfe8;">SK</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
+            <td><div class="cell-stacked"><div><span class="badge-jenis-surat badge-keputusan">Surat Keputusan</span></div><span class="cell-sub-text">${surat['Perihal/Deskripsi'] || '-'}</span></div></td>
             <td><span class="cell-normal-text">${surat['Tujuan/Penerima'] || '-'}</span></td>
             <td><span class="cell-muted-text">${surat['Keterangan'] || '-'}</span></td>
             <td class="text-center"><div class="table-icon-group">
@@ -974,7 +974,7 @@ function renderBarisSuratPerjadin(dataRows) {
         html += `<tr>
             <td>
                 <div class="cell-stacked">
-                    <div><span class="badge-jenis-surat" style="background-color: #fef3c7; color: #b45309; border-color: #fde68a;">${surat['Jenis'] || '-'}</span></div>
+                    <div><span class="badge-jenis-surat badge-perjadin">${surat['Jenis'] || '-'}</span></div>
                     <span class="cell-sub-text" style="font-size: 0.85rem; margin-top: 5px;"><b>Berangkat:</b><br>${tglBerangkat}</span>
                     <span class="cell-sub-text" style="font-size: 0.85rem; color: #64748b;"><i class="fa-regular fa-clock"></i> ${surat['Lama'] || '-'}</span>
                 </div>
