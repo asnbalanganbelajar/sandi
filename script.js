@@ -2441,15 +2441,31 @@ async function handleSimpanPengaturan(event) {
         const result = await response.json();
 
         if (result.status === 'success') {
+            
+            // --- KODE DETEKSI EDIT DIRI SENDIRI ---
+            if (submodul === 'admin' && tipeCrud === 'update' && userMasuk && idLama === userMasuk.username) {
+                Swal.fire({
+                    title: 'Pembaruan Berhasil',
+                    text: 'Anda telah mengubah kredensial/data akun Anda sendiri. Demi keamanan, silakan login kembali.',
+                    icon: 'success',
+                    confirmButtonColor: '#1a365d',
+                    allowOutsideClick: false
+                }).then(() => {
+                    localStorage.removeItem('currentUser'); // Hapus sesi
+                    window.location.replace('login.html'); // Tendang ke login
+                });
+                return; // Hentikan eksekusi kode di bawahnya
+            }
+            // --------------------------------------
+
+            // Eksekusi normal jika yang diedit/ditambah BUKAN diri sendiri
             TampilkanToast('success', result.data.message);
             tutupModalPengaturan();
             
-            // Segarkan tabel secara otomatis
             fetchPengaturanData(submodul);
 
-            // Segarkan referensi global (agar dropdown form surat ikut terupdate!)
             if (submodul === 'jenis' || submodul === 'pegawai') {
-                statusMemuatReferensi = false; // Buka paksa kunci referensi
+                statusMemuatReferensi = false; 
                 referensiSudahDimuat = false;
                 muatReferensiGlobal();
             }
@@ -2468,6 +2484,18 @@ async function handleSimpanPengaturan(event) {
 // EKSEKUSI CRUD PENGATURAN (HAPUS 2-LANGKAH)
 // ==========================================
 function hapusPengaturan(submodul, idLama) {
+    // --- KODE PENCEGAT HAPUS DIRI SENDIRI ---
+    if (submodul === 'admin' && userMasuk && idLama === userMasuk.username) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Tindakan Ditolak',
+            text: 'Anda tidak dapat menghapus akun Anda sendiri saat sedang menggunakannya!',
+            confirmButtonColor: '#1a365d'
+        });
+        return; // Hentikan proses ke bawah
+    }
+    // ----------------------------------------
+
     Swal.fire({
         title: 'Hapus Data Permanen?',
         text: "Tindakan ini tidak bisa dibatalkan.",
