@@ -2343,15 +2343,15 @@ function bukaModalPengaturan(submodul, dataEdit = null) {
         formContainer.innerHTML = `
             <div class="form-group margin-bottom">
                 <label>Nama *</label>
-                <input type="text" id="pengaturan-admin-nama" value="${isEdit ? dataEdit.nama : ''}" required>
+                <input type="text" id="pengaturan-admin-nama" value="${isEdit ? dataEdit.nama : ''}" required autocomplete="off">
             </div>
             <div class="form-group margin-bottom">
                 <label>Username *</label>
-                <input type="text" id="pengaturan-admin-username" value="${isEdit ? dataEdit.username : ''}" required>
+                <input type="text" id="pengaturan-admin-username" value="${isEdit ? dataEdit.username : ''}" required autocomplete="off">
             </div>
             <div class="form-group margin-bottom">
                 <label>Password ${isEdit ? '<small style="color:#e53e3e;">(Kosongkan jika tidak ingin diubah)</small>' : '*'}</label>
-                <input type="password" id="pengaturan-admin-pass" ${isEdit ? '' : 'required'} placeholder="Ketik sandi rahasia...">
+                <input type="password" id="pengaturan-admin-pass" ${isEdit ? '' : 'required'} placeholder="Ketik sandi rahasia..." autocomplete="new-password">
             </div>
             <div class="form-group margin-bottom">
                 <label>Hak Akses (Role) *</label>
