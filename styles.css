@@ -821,16 +821,39 @@ h1, h2, h3 {
 /* Badge Jenis Surat Minimalis & Tegas */
 .badge-jenis-surat {
     display: inline-block;
-    background-color: #e0e7ff; /* Biru muda (indigo) yang lebih tegas namun tetap sejuk */
-    color: #3730a3; /* Biru gelap untuk teks agar kontras maksimal */
-    border: 1px solid #c7d2fe; /* Garis batas tipis untuk mempertegas bentuk kotak */
-    padding: 4px 10px; /* Padding sedikit dilebarkan agar lebih proporsional */
-    border-radius: 6px; /* Sudut sedikit lebih membulat */
+    padding: 4px 10px; 
+    border-radius: 6px; 
     font-size: 0.75rem;
-    font-weight: 700; /* Ditebalkan sedikit */
+    font-weight: 700; 
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Bayangan sangat halus */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
+    /* Warna dihapus dari dasar, dipindah ke kelas spesifik di bawah */
+}
+
+/* Varian Warna Badge Sesuai Tema Modul */
+.badge-masuk {
+    background-color: #ccfbf1; /* Hijau Tosca Lembut */
+    color: #0f766e; /* Hijau Tosca Gelap */
+    border: 1px solid #99f6e4;
+}
+
+.badge-keluar {
+    background-color: #dbeafe; /* Biru Lembut */
+    color: #1d4ed8; /* Biru Gelap */
+    border: 1px solid #bfdbfe;
+}
+
+.badge-keputusan {
+    background-color: #fae8ff; /* Ungu Lembut */
+    color: #a21caf; /* Ungu Gelap */
+    border: 1px solid #f5d0fe;
+}
+
+.badge-perjadin {
+    background-color: #fef3c7; /* Oranye/Kuning Lembut */
+    color: #b45309; /* Oranye Gelap */
+    border: 1px solid #fde68a;
 }
 
 /* ==========================================
